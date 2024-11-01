@@ -18,6 +18,7 @@
 #include "FourQubitPad.hh"
 #include "FourQubitTransmissionLine.hh"
 #include "FourQubitStraightFluxLine.hh"
+#include "FourQubitCurveFluxLine.hh"
 #include "FourQubitCornerFluxLine.hh"
 #include "FourQubitResonatorAssembly.hh"
 #include "G4CMPPhononElectrode.hh"
@@ -369,7 +370,8 @@ void FourQubitDetectorConstruction::SetupGeometry()
       
       //--------------------
       G4ThreeVector topStraightFluxLineTranslate(dp_topCenterFluxLineOffsetX,dp_topCenterFluxLineOffsetY,0);
-      FourQubitStraightFluxLine * topStraightFLine = new FourQubitStraightFluxLine(0,
+      //FourQubitStraightFluxLine * topStraightFLine = new FourQubitStraightFluxLine(0,
+      FourQubitCurveFluxLine * topStraightFLine = new FourQubitCurveFluxLine(0,
 											 topStraightFluxLineTranslate,
 											 "TopStraightFluxLine",
 											 log_groundPlane,
@@ -425,7 +427,7 @@ void FourQubitDetectorConstruction::SetupGeometry()
 	}
 
       }
-
+ 
 	
 
        
@@ -552,15 +554,17 @@ void FourQubitDetectorConstruction::SetupGeometry()
 
       //Do the logical border creation now
       for( int iSubVol = 0; iSubVol < bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol){
-	std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+	        std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
 
-	std::string tempName = "border_siliconChip_" + std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);	  
-	if( std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos ){
-	  G4CMPLogicalBorderSurface * border_siliconChip_bottomRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
-	}
-	if( std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos ){
-	  G4CMPLogicalBorderSurface * border_siliconChip_bottomRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
-	}
+	        std::string tempName = "border_siliconChip_" + std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);	  
+	        
+          if( std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos ){
+	          G4CMPLogicalBorderSurface * border_siliconChip_bottomRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+	        }
+	        
+          if( std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos ){
+	          G4CMPLogicalBorderSurface * border_siliconChip_bottomRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+	        }
       }
     }
   }
@@ -577,8 +581,6 @@ void FourQubitDetectorConstruction::SetupGeometry()
     fSuperconductorSensitivity = new FourQubitSensitivity("PhononElectrode");
   SDman->AddNewDetector(fSuperconductorSensitivity);
   log_siliconChip->SetSensitiveDetector(fSuperconductorSensitivity);
-
-
 
 }
 

@@ -349,7 +349,8 @@ void FourQubitResonatorAssembly::MakeResonatorLine(G4String pName, G4LogicalVolu
   niobium_vis->SetVisibility(true);
   G4VisAttributes* air_vis= new G4VisAttributes(G4Colour(0.5,0.5,0.5,0.5));
   air_vis->SetVisibility(true);
-
+  G4VisAttributes* attention_vis= new G4VisAttributes(G4Colour(1.0,0.0,0.0,1.0));
+  attention_vis->SetVisibility(true);
   
   
   //This will be made in two batches: one for "empty" space and one for "conductor" space (the line itself)
@@ -481,7 +482,7 @@ void FourQubitResonatorAssembly::MakeResonatorLine(G4String pName, G4LogicalVolu
   G4Box * solid_shl1Conductor = new G4Box(shl1ConductorNameSolid,0.5 * dp_shl1ConductorDimX,0.5 * dp_shl1ConductorDimY,0.5 * dp_shl1ConductorDimZ);
   G4LogicalVolume * log_shl1Conductor = new G4LogicalVolume(solid_shl1Conductor,niobium_mat,shl1ConductorNameLog);
   G4VPhysicalVolume * shl1Conductor = new G4PVPlacement(0,G4ThreeVector(0,0,0),log_shl1Conductor,shl1ConductorName,log_shl1Empty,false,0,true);
-  log_shl1Conductor->SetVisAttributes(niobium_vis);
+  log_shl1Conductor->SetVisAttributes(attention_vis);
   fFundamentalVolumeList.push_back(std::tuple<std::string,G4String,G4VPhysicalVolume*>("Niobium",shl1ConductorName,shl1Conductor));
 
 

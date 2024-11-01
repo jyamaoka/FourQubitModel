@@ -67,6 +67,7 @@ int main(int argc,char** argv)
  if (argc==1)   // Define UI session for interactive mode
  {
       G4UIExecutive * ui = new G4UIExecutive(argc,argv);
+      UImanager->ApplyCommand("/control/execute init_vis.mac");
       ui->SessionStart();
       delete ui;
  }
