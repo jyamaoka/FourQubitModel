@@ -54,6 +54,7 @@ set(FourQubit_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitResonatorAssembly.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitStraightFluxLine.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitCornerFluxLine.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitCurveFluxLine.cc
     )
     
 if(USE_GEANT4_STATIC_LIBS)
@@ -70,6 +71,25 @@ target_link_libraries(FourQubitLib ${G4CMP_LIBRARIES} ${Geant4_LIBRARIES})
 
 add_executable(FourQubit FourQubit.cc)
 target_link_libraries(FourQubit FourQubitLib)
+
+#----------------------------------------------------------------------------
+# Copy all scripts to the build directory, i.e. the directory in which we
+# build. This is so that we can run the executable directly because it
+# relies on these scripts being in the current working directory.
+#
+set(SHIELDMODEL_SCRIPTS
+  init_vis.mac
+  vis.mac
+  )
+
+foreach(_script ${SHIELDMODEL_SCRIPTS})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/G4Macros/${_script}
+    ${PROJECT_BINARY_DIR}/${_script}
+    COPYONLY
+    )
+endforeach()
+#----------------------------------------------------------------------------
 
 install(TARGETS FourQubitLib DESTINATION lib)
 install(TARGETS FourQubit DESTINATION bin)

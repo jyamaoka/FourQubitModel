@@ -241,9 +241,6 @@ void FourQubitTransmissionLine::ConstructTransmissionLine(G4RotationMatrix * pRo
 									 true);
   fFundamentalVolumeList.push_back(std::tuple<std::string,G4String,G4VPhysicalVolume*>("Niobium",tlNameConductor,phys_transmissionLineConductor));
 
-  
-
-
 
   ///////////////////////////////////////////
   // Output logical/physical volume selection

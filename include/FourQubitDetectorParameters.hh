@@ -236,7 +236,8 @@ namespace FourQubitDetectorParameters
   //Flux line parameters
 
   constexpr bool dp_useFluxLines = true;
-  
+  constexpr double cosOf45 = 0.7071067812; 
+
   //Straight flux line info
   constexpr double dp_fluxLineBaseNbLayerDimX = 625 * CLHEP::um;
   constexpr double dp_fluxLineBaseNbLayerDimY = 1882.005 * CLHEP::um;
@@ -252,6 +253,38 @@ namespace FourQubitDetectorParameters
   constexpr double dp_fluxLineConductorDimY = dp_fluxLineEmptyDimY;
   constexpr double dp_fluxLineConductorDimZ = dp_groundPlaneDimZ;
 
+  //Curve flux line info (1)
+  constexpr double dp_cfluxLineBaseNbLayerDimX = 800 * CLHEP::um;
+  constexpr double dp_cfluxLineBaseNbLayerDimY = 1600 * CLHEP::um;
+  constexpr double dp_cfluxLineBaseNbLayerDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_cfluxLinePadOffsetY = 0.5*dp_cfluxLineBaseNbLayerDimY - 0.5*dp_padEmptyPart1DimX;
+  constexpr double dp_cfluxLinePadOffsetX = 0.5*dp_padEmptyPart1DimY - 0.5*dp_cfluxLineBaseNbLayerDimX;
+
+  // s 1
+  constexpr double dp_fluxLine1EmptyDimX = 22 * CLHEP::um;
+  constexpr double dp_fluxLine1EmptyDimY = 260 * CLHEP::um;
+  constexpr double dp_fluxLine1EmptyDimZ = dp_groundPlaneDimZ;
+  constexpr double dp_fluxLine1LineOffsetY = 0.5*dp_cfluxLineBaseNbLayerDimY - dp_padEmptyPart1DimX - dp_padEmptyPart2TrdZ - 0.5*dp_fluxLine1EmptyDimY;
+  constexpr double dp_fluxLine1LineOffsetX = dp_cfluxLinePadOffsetX;
+  constexpr double dp_fluxLine1ConductorDimX = 10.15* CLHEP::um;
+  constexpr double dp_fluxLine1ConductorDimY = dp_fluxLine1EmptyDimY;
+  constexpr double dp_fluxLine1ConductorDimZ = dp_groundPlaneDimZ;
+
+  // c 1
+  constexpr double dp_curveFluxLineCurveRadius = 260 * CLHEP::um;
+  constexpr double dp_fluxLineCurveOffsetY     = 0.5*dp_cfluxLineBaseNbLayerDimY - dp_padEmptyPart1DimX - dp_padEmptyPart2TrdZ - dp_fluxLine1EmptyDimY;
+  constexpr double dp_fluxLineCurveOffsetX     = dp_cfluxLinePadOffsetX + dp_curveFluxLineCurveRadius;
+
+  // s 2
+  constexpr double dp_fluxLine2EmptyDimX = dp_fluxLine1EmptyDimY;
+  constexpr double dp_fluxLine2EmptyDimY = dp_fluxLine1EmptyDimX;
+  constexpr double dp_fluxLine2EmptyDimZ = dp_groundPlaneDimZ;
+  constexpr double dp_fluxLine2LineOffsetY = 0.5*dp_cfluxLineBaseNbLayerDimY - dp_padEmptyPart1DimX - dp_padEmptyPart2TrdZ - dp_fluxLine1ConductorDimY - dp_curveFluxLineCurveRadius;
+  constexpr double dp_fluxLine2LineOffsetX = dp_cfluxLinePadOffsetX + dp_curveFluxLineCurveRadius + 0.5*dp_fluxLine2EmptyDimX;
+  constexpr double dp_fluxLine2ConductorDimX = dp_fluxLine1ConductorDimY;
+  constexpr double dp_fluxLine2ConductorDimY = dp_fluxLine1ConductorDimX;
+  constexpr double dp_fluxLine2ConductorDimZ = dp_groundPlaneDimZ;
 
   //Corner flux line info (initially made for pad closest to top left corner of qubit - will template and rotate)
   constexpr double dp_cornerVertFudgeFactor = 60*CLHEP::um;
@@ -260,8 +293,6 @@ namespace FourQubitDetectorParameters
   constexpr double dp_cornerFluxLineBaseNbLayerDimY = 1948.084 * CLHEP::um + dp_cornerVertFudgeFactor + dp_cornerVertFudgeFactor2;
   constexpr double dp_cornerFluxLineBaseNbLayerDimZ = dp_groundPlaneDimZ;
 
-  
-  constexpr double cosOf45 = 0.7071067812; 
   constexpr double dp_cornerFluxLineCurveRadius = 100 * CLHEP::um;
   constexpr double dp_cornerFluxLineCurve1WrtPadPointX = cosOf45*dp_cornerFluxLineCurveRadius; //45 degree angle
   constexpr double dp_cornerFluxLineCurve1WrtPadPointY = cosOf45*dp_cornerFluxLineCurveRadius; //45 degree angle
