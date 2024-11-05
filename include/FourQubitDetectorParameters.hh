@@ -333,14 +333,35 @@ namespace FourQubitDetectorParameters
   constexpr double dp_topLeftFluxLineOffsetX = -0.5 * dp_groundPlaneDimX + 0.5 * dp_cornerFluxLineBaseNbLayerDimX + dp_cornerFluxLinePadCornerDistanceFromWall;
   constexpr double dp_topLeftFluxLineOffsetY = 0.5 * dp_groundPlaneDimY - 0.5 * dp_cornerFluxLineBaseNbLayerDimY - dp_cornerFluxLinePadCornerDistanceFromWall;
 
-
-
-
-
   //Corner flux line info
-  
-  
-  
+
+  //
+  // Transmon parameters
+  constexpr double dp_transmonSpacing = 15 *CLHEP::um;
+
+  constexpr double dp_transmonFieldDimX = 650 *CLHEP::um;
+  constexpr double dp_transmonFieldDimY = 650 *CLHEP::um;
+  constexpr double dp_transmonFieldDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_transmonCapBar0DimX = 60 *CLHEP::um;
+  constexpr double dp_transmonCapBar0DimY = 450 *CLHEP::um;
+  constexpr double dp_transmonCapBar0DimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_transmonCapBar1DimX = 60 *CLHEP::um;
+  constexpr double dp_transmonCapBar1DimY = 450 *CLHEP::um;
+  constexpr double dp_transmonCapBar1DimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_transmonCapCoupDimX = 64 *CLHEP::um;
+  constexpr double dp_transmonCapCoupDimY = 30 *CLHEP::um;
+  constexpr double dp_transmonCapCoupDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_transmonResCoupDimX = 67 *CLHEP::um;
+  constexpr double dp_transmonResCoupDimY = 30 *CLHEP::um;
+  constexpr double dp_transmonResCoupDimZ = dp_groundPlaneDimZ;  
+
+  constexpr double dp_transmonResLineDimX = 0.5*dp_transmonFieldDimX - 1.0*dp_transmonSpacing - dp_transmonCapBar1DimX - dp_transmonResCoupDimX;
+  constexpr double dp_transmonResLineDimY = dp_tlCouplingConductorDimY;
+  constexpr double dp_transmonResLineDimZ = dp_groundPlaneDimZ;
 }
 
 
