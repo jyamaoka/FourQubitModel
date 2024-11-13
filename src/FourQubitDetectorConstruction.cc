@@ -22,6 +22,7 @@
 #include "FourQubitCornerFluxLine.hh"
 #include "FourQubitResonatorAssembly.hh"
 #include "FourQubitTransmon.hh"
+#include "FourQubitXmon.hh"
 #include "G4CMPPhononElectrode.hh"
 #include "G4CMPElectrodeSensitivity.hh"
 #include "G4CMPLogicalBorderSurface.hh"
@@ -580,6 +581,39 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                              std::get<2>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
          }
       }
+
+      // Xmon
+      //--------------------
+      G4ThreeVector locateXmon0(-1.0*mm, 1.0*mm, 0);
+      
+      FourQubitXmon *topXmon = new FourQubitXmon(0,
+                                                            locateXmon0,
+                                                            "Xmon",
+                                                            log_groundPlane,
+                                                            false,
+                                                            0,
+                                                            checkOverlaps);
+      G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
+      G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < topXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
+                   << " with material " << std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topXmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topXmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }      
    }
 
    //---------------------------------------------------------------------------------------------------------------------
