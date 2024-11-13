@@ -333,9 +333,12 @@ namespace FourQubitDetectorParameters
   constexpr double dp_topLeftFluxLineOffsetX = -0.5 * dp_groundPlaneDimX + 0.5 * dp_cornerFluxLineBaseNbLayerDimX + dp_cornerFluxLinePadCornerDistanceFromWall;
   constexpr double dp_topLeftFluxLineOffsetY = 0.5 * dp_groundPlaneDimY - 0.5 * dp_cornerFluxLineBaseNbLayerDimY - dp_cornerFluxLinePadCornerDistanceFromWall;
 
-  //Corner flux line info
 
+
+  //----------------------------------------------------------------
+  // Qubit parameters
   //
+  
   // Transmon parameters
   constexpr double dp_transmonSpacing = 15 *CLHEP::um;
 
@@ -362,6 +365,58 @@ namespace FourQubitDetectorParameters
   constexpr double dp_transmonResLineDimX = 0.5*dp_transmonFieldDimX - 1.0*dp_transmonSpacing - dp_transmonCapBar1DimX - dp_transmonResCoupDimX;
   constexpr double dp_transmonResLineDimY = dp_tlCouplingConductorDimY;
   constexpr double dp_transmonResLineDimZ = dp_groundPlaneDimZ;
+
+  // Xmon parameters
+  constexpr double dp_xmonSpacing = dp_tlCouplingConductorDimY;
+
+  constexpr double dp_xmonBaseNbLayerDimX = 320 *CLHEP::um;
+  constexpr double dp_xmonBaseNbLayerDimY = 320 *CLHEP::um;
+  constexpr double dp_xmonBaseNbLayerDimZ = dp_groundPlaneDimZ;
+
+  //xmon empty
+  constexpr double dp_xmonVertBlockEmptyDimX = 72 *CLHEP::um;
+  constexpr double dp_xmonVertBlockEmptyDimY = 300 *CLHEP::um;
+  constexpr double dp_xmonVertBlockEmptyDimZ = dp_groundPlaneDimZ;
+  constexpr double dp_xmonVertBlockEmptyNubDimX = 33 *CLHEP::um;
+  constexpr double dp_xmonVertBlockEmptyNubDimY = 45 *CLHEP::um;
+
+
+  constexpr double dp_xmonHorizontalBlockEmptyDimX = dp_xmonVertBlockEmptyDimY;
+  constexpr double dp_xmonHorizontalBlockEmptyDimY = dp_xmonVertBlockEmptyDimX;
+  constexpr double dp_xmonHorizontalBlockEmptyDimZ = dp_groundPlaneDimZ;
+
+  //xmon conductor
+  constexpr double dp_xmonVertBlockConductorDimX = 24 *CLHEP::um;
+  constexpr double dp_xmonVertBlockConductorDimY = 230 *CLHEP::um;
+  constexpr double dp_xmonVertBlockConductorDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_xmonHorizontalBlockConductorDimX = dp_xmonVertBlockConductorDimY;
+  constexpr double dp_xmonHorizontalBlockConductorDimY = dp_xmonVertBlockConductorDimX;
+  constexpr double dp_xmonHorizontalBlockConductorDimZ = dp_groundPlaneDimZ;
+
+  //coupler empty
+  constexpr double dp_xmonCouplerHorizontalEmptyDimX = 90*CLHEP::um;
+  constexpr double dp_xmonCouplerHorizontalEmptyDimY = 24*CLHEP::um;
+  constexpr double dp_xmonCouplerHorizontalEmptyDimZ = dp_groundPlaneDimZ;
+  
+  constexpr double dp_xmonCouplerLobeEmptyDimX = 24*CLHEP::um;
+  constexpr double dp_xmonCouplerLobeEmptyDimY = 56*CLHEP::um;
+  constexpr double dp_xmonCouplerLobeEmptyDimZ = dp_groundPlaneDimZ;
+
+  //coupler conductor
+  constexpr double dp_xmonCouplerHorizontalConductorDimX = 75*CLHEP::um;
+  constexpr double dp_xmonCouplerHorizontalConductorDimY = 11*CLHEP::um;
+  constexpr double dp_xmonCouplerHorizontalConductorDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_xmonCouplerLobeConductorDimX = 11*CLHEP::um;
+  constexpr double dp_xmonCouplerLobeConductorDimY = 50*CLHEP::um;
+  constexpr double dp_xmonCouplerLobeConductorDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_xmonResLineDimX = dp_tlCouplingConductorDimY; 
+  constexpr double dp_xmonResLineDimY = 0.5*dp_xmonBaseNbLayerDimY - 1.0*dp_xmonSpacing - dp_xmonVertBlockEmptyDimY - dp_xmonVertBlockEmptyDimY;
+  constexpr double dp_xmonResLineDimZ = dp_groundPlaneDimZ;
+  constexpr double dp_xmonResLineEmptyDimY = dp_tlCouplingEmptyDimY;
+
 }
 
 

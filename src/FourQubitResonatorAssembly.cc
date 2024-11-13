@@ -405,7 +405,7 @@ void FourQubitResonatorAssembly::MakeResonatorLine(G4String pName, G4LogicalVolu
   G4Box * solid_tlCouplingConductor = new G4Box(tlCouplingConductorNameSolid,0.5 * dp_tlCouplingConductorDimX,0.5 * dp_tlCouplingConductorDimY,0.5 * dp_tlCouplingConductorDimZ);
   G4LogicalVolume * log_tlCouplingConductor = new G4LogicalVolume(solid_tlCouplingConductor,niobium_mat,tlCouplingConductorNameLog);
   G4VPhysicalVolume * tlCouplingConductor = new G4PVPlacement(0,G4ThreeVector(0,0,0),log_tlCouplingConductor,tlCouplingConductorName,log_tlCouplingEmpty,false,0,true);
-  log_tlCouplingConductor->SetVisAttributes(niobium_vis);
+  log_tlCouplingConductor->SetVisAttributes(attention_vis);
   fFundamentalVolumeList.push_back(std::tuple<std::string,G4String,G4VPhysicalVolume*>("Niobium",tlCouplingConductorName,tlCouplingConductor));
 
 
