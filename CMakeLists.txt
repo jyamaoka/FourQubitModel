@@ -54,6 +54,7 @@ set(FourQubit_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitTransmon.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitXmon.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitResonatorAssembly.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitResonator.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitStraightFluxLine.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitCornerFluxLine.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/FourQubitCurveFluxLine.cc

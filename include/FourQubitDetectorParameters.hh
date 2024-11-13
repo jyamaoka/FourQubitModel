@@ -417,6 +417,30 @@ namespace FourQubitDetectorParameters
   constexpr double dp_xmonResLineDimZ = dp_groundPlaneDimZ;
   constexpr double dp_xmonResLineEmptyDimY = dp_tlCouplingEmptyDimY;
 
+  //----------------------------------------------------------------
+  // Resonator parameters
+  //
+  constexpr double dp_resonatorConductorWidth = dp_tlCouplingConductorDimY;
+  constexpr double dp_resonatorEmptyWidth     = dp_tlCouplingEmptyDimY;
+
+  constexpr double dp_resonatorBaseNbEdgeBottomDimY = 5.0 * CLHEP::um;
+
+  constexpr double dp_resonatorBaseNbLayerDimX = 600 *CLHEP::um; //520
+  constexpr double dp_resonatorBaseNbLayerDimY = 600 *CLHEP::um;
+  constexpr double dp_resonatorBaseNbLayerDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_shlEmptyDimX = 390 *CLHEP::um;
+  constexpr double dp_shlEmptyDimY = dp_tlCouplingEmptyDimY;
+  constexpr double dp_shlEmptyDimZ = dp_groundPlaneDimZ;
+
+  constexpr double dp_shlConductorDimX = 390 *CLHEP::um;
+  constexpr double dp_shlConductorDimY = dp_tlCouplingConductorDimY;
+  constexpr double dp_shlConductorDimZ = dp_groundPlaneDimZ;
+
+  //Curve parameters
+  constexpr double dp_resonatorCurveSmallestRadius = 52 * CLHEP::um;
+  constexpr double dp_resonatorCurveCentralRadius = dp_resonatorCurveSmallestRadius + dp_tlCouplingEmptyDimY / 2.0;
+
 }
 
 
