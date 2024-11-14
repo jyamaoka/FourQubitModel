@@ -23,6 +23,8 @@
 #include "FourQubitResonatorAssembly.hh"
 #include "FourQubitTransmon.hh"
 #include "FourQubitXmon.hh"
+#include "FourQubitResonator.hh"
+
 #include "G4CMPPhononElectrode.hh"
 #include "G4CMPElectrodeSensitivity.hh"
 #include "G4CMPLogicalBorderSurface.hh"
@@ -612,6 +614,39 @@ void FourQubitDetectorConstruction::SetupGeometry()
          {
             G4CMPLogicalBorderSurface *border_siliconChip_topXmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
                                              std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }      
+
+   // Resonator
+      //--------------------
+      G4ThreeVector locateResonator0(-1.0*mm, -1.0*mm, 0);
+      
+      FourQubitResonator *topResonator = new FourQubitResonator(0,
+                                                            locateResonator0,
+                                                            "Resonator",
+                                                            log_groundPlane,
+                                                            false,
+                                                            0,
+                                                            checkOverlaps);
+      G4LogicalVolume *log_Resonator = topResonator->GetLogicalVolume();
+      G4VPhysicalVolume *phys_Resonator = topResonator->GetPhysicalVolume();
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < topResonator->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
+                   << " with material " << std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonatorEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonatorConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
          }
       }      
    }
