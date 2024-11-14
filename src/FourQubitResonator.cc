@@ -125,7 +125,7 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
 
   //------------------------------------------------------
   // Some useful translations relative to the center of the plane in which all of this is embedded
-  G4ThreeVector brCornerOfBaseNbLayer(0.5 * dp_resonatorBaseNbLayerDimX, -0.5 * dp_resonatorBaseNbLayerDimY, 0); // Bottom right corner relative to center of the plane
+  G4ThreeVector brCornerOfBaseNbLayer(0.35 * dp_resonatorBaseNbLayerDimX, -0.5 * dp_resonatorBaseNbLayerDimY, 0); // Bottom right corner relative to center of the plane
 
   G4ThreeVector currentPoint(0, 0, 0);
 
@@ -181,7 +181,7 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
                                                90. * deg, 180. * deg);
     G4LogicalVolume *log_halfCircleEmpty = new G4LogicalVolume(solid_halfCircleEmpty, air_mat, halfCircleEmptyNameLog);
 
-    G4ThreeVector halfCircleWrtBRCorner = currentPoint + G4ThreeVector(-0.5 * dp_shlEmptyDimX,
+    G4ThreeVector halfCircleWrtBRCorner = currentPoint + G4ThreeVector((i % 2 == 0) ? -0.5 * dp_shlEmptyDimX : 0.5 * dp_shlEmptyDimX,
                                                                        dp_resonatorCurveCentralRadius,
                                                                        0.0);
 

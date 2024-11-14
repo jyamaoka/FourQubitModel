@@ -425,8 +425,8 @@ namespace FourQubitDetectorParameters
 
   constexpr double dp_resonatorBaseNbEdgeBottomDimY = 5.0 * CLHEP::um;
 
-  constexpr double dp_resonatorBaseNbLayerDimX = 600 *CLHEP::um; //520
-  constexpr double dp_resonatorBaseNbLayerDimY = 600 *CLHEP::um;
+  constexpr double dp_resonatorBaseNbLayerDimX = 670 *CLHEP::um; //520
+  constexpr double dp_resonatorBaseNbLayerDimY = 670 *CLHEP::um;
   constexpr double dp_resonatorBaseNbLayerDimZ = dp_groundPlaneDimZ;
 
   constexpr double dp_shlEmptyDimX = 390 *CLHEP::um;
