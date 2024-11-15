@@ -100,8 +100,8 @@ void FourQubitTransmon::ConstructTransmon(G4RotationMatrix * pRot,
   G4LogicalVolume * log_baseAirLayer = new G4LogicalVolume(solid_baseAirLayer,
 							  air_mat,
 							  baseAirLayerNameLog);
-  log_baseAirLayer->SetVisAttributes(attention_vis); // 
-//  log_baseAirLayer->SetVisAttributes(G4VisAttributes::Invisible);//niobium_vis);
+  log_baseAirLayer->SetVisAttributes(air_vis); // 
+  //log_baseAirLayer->SetVisAttributes(G4VisAttributes::Invisible);//niobium_vis);
 
   //Now, create a physical volume and G4PVPlacement for storing as the final output. This is the
   //top volume.
