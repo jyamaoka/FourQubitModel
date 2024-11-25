@@ -35,7 +35,7 @@ public:
   // Access functions
   G4VPhysicalVolume *GetPhysicalVolume() { return fPhys_output; }
   G4LogicalVolume *GetLogicalVolume() { return fLog_output; }
-  G4ThreeVector *GetResEndVector() { return fEndVect_output; }
+  G4ThreeVector GetResEndVector() { return fEndVect_output; }
 
   // Acutally make the model
   void ConstructResonator(G4RotationMatrix *pRot,
@@ -51,11 +51,12 @@ public:
   std::vector<std::tuple<std::string, G4String, G4VPhysicalVolume *>> GetListOfAllFundamentalSubVolumes();
 
 protected:
+
 private:
   // The final G4PVPlacement
   G4LogicalVolume *fLog_output;
   G4VPhysicalVolume *fPhys_output;
-  G4ThreeVector *fEndVect_output;
+  G4ThreeVector fEndVect_output;
 
   std::vector<std::tuple<std::string, G4String, G4VPhysicalVolume *>> fFundamentalVolumeList;
 };
