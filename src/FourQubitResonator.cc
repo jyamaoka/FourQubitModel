@@ -33,7 +33,9 @@ FourQubitResonator::FourQubitResonator(G4RotationMatrix *pRot,
                                        G4LogicalVolume *pMotherLogical,
                                        G4bool pMany,
                                        G4int pCopyNo,
-                                       G4bool pSurfChk)
+                                       G4bool pSurfChk,
+                                       G4int pLines,
+                                       G4float plLineLen)
 {
   // Here, use the inputs to this to set up the geometry and fill out the PVPlacement data member,
   // which is the real output from this class (and which we'll access in our detector construction file
@@ -45,7 +47,9 @@ FourQubitResonator::FourQubitResonator(G4RotationMatrix *pRot,
                      pMotherLogical,
                      pMany,
                      pCopyNo,
-                     pSurfChk);
+                     pSurfChk,
+                     pLines,
+                     plLineLen);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -68,7 +72,9 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
                                             G4LogicalVolume *pMotherLogical,
                                             G4bool pMany,
                                             G4int pCopyNo,
-                                            G4bool pSurfChk)
+                                            G4bool pSurfChk, 
+                                            G4int pLines,
+                                            G4float plLineLen)
 {
 
   // Start with some preliminaries - NIST manager
@@ -102,8 +108,8 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
   G4LogicalVolume *log_baseNbLayer = new G4LogicalVolume(solid_baseNbLayer,
                                                          niobium_mat,
                                                          baseNbLayerNameLog);
-  //log_baseNbLayer->SetVisAttributes(attention_vis); //
-  log_baseNbLayer->SetVisAttributes(G4VisAttributes::Invisible);//niobium_vis);
+  // log_baseNbLayer->SetVisAttributes(attention_vis); //
+  log_baseNbLayer->SetVisAttributes(G4VisAttributes::Invisible); // niobium_vis);
 
   // Now, create a physical volume and G4PVPlacement for storing as the final output. This is the
   // top volume.
@@ -127,33 +133,35 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
   // Some useful translations relative to the center of the plane in which all of this is embedded
   G4ThreeVector brCornerOfBaseNbLayer(0.35 * dp_resonatorBaseNbLayerDimX, -0.5 * dp_resonatorBaseNbLayerDimY, 0); // Bottom right corner relative to center of the plane
 
-  G4ThreeVector currentPoint(0, 0, 0);
 
   G4RotationMatrix *rotation = new G4RotationMatrix();
   rotation->rotateZ(180.0 * deg);
 
-  for (int i = 0; i != 6; ++i)
-  {
+  G4ThreeVector currentPoint(-0.5 * dp_tlCouplingEmptyDimX, 0.5 * dp_tlCouplingEmptyDimY + dp_resonatorAssemblyBaseNbEdgeBottomDimY, 0.0); // Good for empty or conductor
+  G4float lineLengthX = dp_shlEmptyDimX;
+
+  for (int i = 0; i != pLines; ++i)
+  { 
+    if (i == pLines - 1){
+      lineLengthX = plLineLen;
+      //currentPoint = halfCircleWrtBRCorner + G4ThreeVector((i % 2 != 0) ? -0.5 * lineLengthX : 0.5 * lineLengthX, dp_resonatorCurveCentralRadius, 0);
+    }
+
     // Straight horizontal line (SHL), (empty/cavity)
     G4String shlEmptyName = pName + "_shlEmpty";
     shlEmptyName.append(i);
     G4String shlEmptyNameSolid = shlEmptyName + "_solid";
     G4String shlEmptyNameLog = shlEmptyName + "_log";
-    G4Box *solid_shlEmpty = new G4Box(shlEmptyNameSolid, 0.5 * dp_shlEmptyDimX, 0.5 * dp_shlEmptyDimY, 0.5 * dp_shlEmptyDimZ);
+    G4Box *solid_shlEmpty = new G4Box(shlEmptyNameSolid,
+                                      0.5 * lineLengthX,
+                                      0.5 * dp_shlEmptyDimY,
+                                      0.5 * dp_shlEmptyDimZ);
     G4LogicalVolume *log_shlEmpty = new G4LogicalVolume(solid_shlEmpty, air_mat, shlEmptyNameLog);
 
-    G4ThreeVector shlWrtBRCorner(-0.5 * dp_tlCouplingEmptyDimX, 0.5 * dp_tlCouplingEmptyDimY + dp_resonatorAssemblyBaseNbEdgeBottomDimY, 0.0); // Good for empty or conductor
-
-    if (i == 0)
-    {
-      currentPoint = shlWrtBRCorner;
-    }
 
     G4VPhysicalVolume *shlEmpty = new G4PVPlacement(0, currentPoint + brCornerOfBaseNbLayer, log_shlEmpty, shlEmptyName, log_baseNbLayer, false, 0, true);
     log_shlEmpty->SetVisAttributes(air_vis);
     fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Vacuum", shlEmptyName, shlEmpty));
-
-    // currentZero = shlWrtBRCorner + brCornerOfBaseNbLayer;
 
     //------------------------------------------------------
     // Straight horizontal line (SHL) (conductor)
@@ -161,13 +169,21 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
     shlConductorName.append(i);
     G4String shlConductorNameSolid = shlConductorName + "_solid";
     G4String shlConductorNameLog = shlConductorName + "_log";
-    G4Box *solid_shlConductor = new G4Box(shlConductorNameSolid, 0.5 * dp_shlConductorDimX, 0.5 * dp_shlConductorDimY, 0.5 * dp_shlConductorDimZ);
+    G4Box *solid_shlConductor = new G4Box(shlConductorNameSolid,
+                                          0.5 * lineLengthX,
+                                          0.5 * dp_shlConductorDimY,
+                                          0.5 * dp_shlConductorDimZ);
     G4LogicalVolume *log_shlConductor = new G4LogicalVolume(solid_shlConductor, niobium_mat, shlConductorNameLog);
     G4VPhysicalVolume *shlConductor = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), log_shlConductor, shlConductorName, log_shlEmpty, false, 0, true);
     log_shlConductor->SetVisAttributes(niobium_vis);
     fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Niobium", shlConductorName, shlConductor));
 
-    if (i==5){continue;}
+    if (i == pLines-1)
+    { 
+        fEndVect_output = & currentPoint;
+        continue; 
+    }
+
     //------------------------------------------------------
     // HalfCircle (empty/cavity)
     G4String halfCircleEmptyName = pName + "_halfCircleEmpty";
@@ -221,7 +237,7 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
     log_halfCircleConductor->SetVisAttributes(niobium_vis);
     fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Niobium", halfCircleConductorName, halfCircleConductor));
 
-    currentPoint = halfCircleWrtBRCorner + G4ThreeVector((i % 2 != 0) ? -0.5 * dp_shlEmptyDimX : 0.5 * dp_shlEmptyDimX, dp_resonatorCurveCentralRadius, 0);
+    currentPoint = halfCircleWrtBRCorner + G4ThreeVector((i % 2 != 0) ? -0.5 * lineLengthX : 0.5 * lineLengthX, dp_resonatorCurveCentralRadius, 0);
   }
 
   ///////////////////////////////////////////

@@ -727,7 +727,9 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                                                  log_groundPlane,
                                                                  false,
                                                                  0,
-                                                                 checkOverlaps);
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 312 * um);
       G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
       G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
 
@@ -758,7 +760,9 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                                                  log_groundPlane,
                                                                  false,
                                                                  0,
-                                                                 checkOverlaps);
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 546*um);
       G4LogicalVolume *log_topResonator1 = topResonator1->GetLogicalVolume();
       G4VPhysicalVolume *phys_topResonator1 = topResonator1->GetPhysicalVolume();
 
@@ -792,7 +796,9 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                                                  log_groundPlane,
                                                                  false,
                                                                  0,
-                                                                 checkOverlaps);
+                                                                 checkOverlaps,
+                                                                 6,
+                                                                 624*um);
       G4LogicalVolume *log_bottomResonator0 = bottomResonator0->GetLogicalVolume();
       G4VPhysicalVolume *phys_bottomResonator0 = bottomResonator0->GetPhysicalVolume();
 
@@ -825,7 +831,9 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                                                  log_groundPlane,
                                                                  false,
                                                                  0,
-                                                                 checkOverlaps);
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 dp_shlConductorDimX);
       G4LogicalVolume *log_bottomResonator1 = bottomResonator1->GetLogicalVolume();
       G4VPhysicalVolume *phys_bottomResonator1 = bottomResonator1->GetPhysicalVolume();
 
