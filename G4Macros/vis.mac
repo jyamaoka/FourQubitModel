@@ -27,8 +27,8 @@
 
 /vis/viewer/set/style wireframe #surface
 /vis/viewer/set/hiddenMarker true
-/vis/viewer/set/viewpointThetaPhi 30 150 #90 180
-/vis/viewer/pan 5.0 0 mm
+#/vis/viewer/set/viewpointThetaPhi 30 150 #90 180
+#/vis/viewer/pan 5.0 0 mm
 /vis/viewer/zoom 1
 
 
