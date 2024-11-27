@@ -29,8 +29,8 @@ namespace FourQubitDetectorParameters
   
   //----------------------------------------------------------------
   //Silicon chip dimensions
-  constexpr double dp_siliconChipDimX = 8.0 * CLHEP::mm;
-  constexpr double dp_siliconChipDimY = 8.0 * CLHEP::mm;
+  constexpr double dp_siliconChipDimX = 5.0 * CLHEP::mm;
+  constexpr double dp_siliconChipDimY = 5.0 * CLHEP::mm;
   constexpr double dp_siliconChipDimZ = 0.381 * CLHEP::mm;
 
 
@@ -62,8 +62,8 @@ namespace FourQubitDetectorParameters
   constexpr double dp_transmissionLineBaseLayerDimZ = dp_groundPlaneDimZ;
   constexpr double dp_transmissionLineCavityFullWidth = 22 * CLHEP::um;
   constexpr double dp_transmissionLineConductorWidth = 10 * CLHEP::um;
-  constexpr double dp_transmissionLinePad1Offset = -3562.5 * CLHEP::um;
-  constexpr double dp_transmissionLinePad2Offset = 3562.5 * CLHEP::um;
+  constexpr double dp_transmissionLinePad1Offset = -2200 * CLHEP::um; //3562.5
+  constexpr double dp_transmissionLinePad2Offset = 2200 * CLHEP::um;
 
   
   //----------------------------------------------------------------
@@ -99,7 +99,7 @@ namespace FourQubitDetectorParameters
   //----------------------------------------------------------------
   //Resonator assembly parameters. Y extent of the mother volume goes from the transmission line cavity side to
   //the flux line cavity side.
-  constexpr bool dp_useResonatorAssembly = true;
+  constexpr bool dp_useResonatorAssembly = false;
   constexpr double dp_resonatorAssemblyBaseNbDimX = 891.618 * CLHEP::um;
   constexpr double dp_resonatorAssemblyBaseNbDimY = 1925.311 * CLHEP::um;
   constexpr double dp_resonatorAssemblyBaseNbDimZ = dp_groundPlaneDimZ;
@@ -263,7 +263,7 @@ namespace FourQubitDetectorParameters
 
   // s 1
   constexpr double dp_fluxLine1EmptyDimX = 22 * CLHEP::um;
-  constexpr double dp_fluxLine1EmptyDimY = 260 * CLHEP::um;
+  constexpr double dp_fluxLine1EmptyDimY = 200 * CLHEP::um; //260
   constexpr double dp_fluxLine1EmptyDimZ = dp_groundPlaneDimZ;
   constexpr double dp_fluxLine1LineOffsetY = 0.5*dp_cfluxLineBaseNbLayerDimY - dp_padEmptyPart1DimX - dp_padEmptyPart2TrdZ - 0.5*dp_fluxLine1EmptyDimY;
   constexpr double dp_fluxLine1LineOffsetX = dp_cfluxLinePadOffsetX;
@@ -328,12 +328,19 @@ namespace FourQubitDetectorParameters
   
   //Overall flux line location parameters
   constexpr double dp_topCenterFluxLineOffsetX = 0;
-  constexpr double dp_topCenterFluxLineOffsetY = 3812.378*CLHEP::um - 0.5*dp_fluxLineBaseNbLayerDimY;
+  constexpr double dp_topCenterFluxLineOffsetY = 2500*CLHEP::um - 0.5*dp_fluxLineBaseNbLayerDimY;
+  constexpr double dp_topCenterFluxLineRotY = 180.0 * CLHEP::deg;
   constexpr double dp_cornerFluxLinePadCornerDistanceFromWall = 51*CLHEP::um;
   constexpr double dp_topLeftFluxLineOffsetX = -0.5 * dp_groundPlaneDimX + 0.5 * dp_cornerFluxLineBaseNbLayerDimX + dp_cornerFluxLinePadCornerDistanceFromWall;
   constexpr double dp_topLeftFluxLineOffsetY = 0.5 * dp_groundPlaneDimY - 0.5 * dp_cornerFluxLineBaseNbLayerDimY - dp_cornerFluxLinePadCornerDistanceFromWall;
+  
+  constexpr double dp_bottomRightFluxLineOffsetX = 1800*CLHEP::um;
+  constexpr double dp_bottomRightFluxLineOffsetY = 2500*CLHEP::um - 0.5*dp_fluxLineBaseNbLayerDimY;
+  constexpr double dp_bottomRightFluxLineRotY = 180.0 * CLHEP::deg;
 
-
+  constexpr double dp_bottomLeftFluxLineOffsetX = -1800*CLHEP::um;
+  constexpr double dp_bottomLeftFluxLineOffsetY = 2500*CLHEP::um - 0.5*dp_fluxLineBaseNbLayerDimY;
+  constexpr double dp_bottomLeftFluxLineRotY = 180.0 * CLHEP::deg;
 
   //----------------------------------------------------------------
   // Qubit parameters
@@ -438,7 +445,7 @@ namespace FourQubitDetectorParameters
   constexpr double dp_shlConductorDimZ = dp_groundPlaneDimZ;
 
   //Curve parameters
-  constexpr double dp_resonatorCurveSmallestRadius = 52 * CLHEP::um;
+  constexpr double dp_resonatorCurveSmallestRadius = 45.5 * CLHEP::um;
   constexpr double dp_resonatorCurveCentralRadius = dp_resonatorCurveSmallestRadius + dp_tlCouplingEmptyDimY / 2.0;
 
 }

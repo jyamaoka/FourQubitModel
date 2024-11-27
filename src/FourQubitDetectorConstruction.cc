@@ -24,6 +24,8 @@
 #include "FourQubitTransmon.hh"
 #include "FourQubitXmon.hh"
 #include "FourQubitResonator.hh"
+#include "FourQubitStraight.hh"
+#include "FourQubitCurve.hh"
 
 #include "G4CMPPhononElectrode.hh"
 #include "G4CMPElectrodeSensitivity.hh"
@@ -365,8 +367,10 @@ void FourQubitDetectorConstruction::SetupGeometry()
 
          //--------------------
          G4ThreeVector topStraightFluxLineTranslate(dp_topCenterFluxLineOffsetX, dp_topCenterFluxLineOffsetY, 0);
+         G4RotationMatrix *rotation = new G4RotationMatrix();
+         rotation->rotateY(dp_topCenterFluxLineRotY);
          // FourQubitStraightFluxLine * topStraightFLine = new FourQubitStraightFluxLine(0,
-         FourQubitCurveFluxLine *topStraightFLine = new FourQubitCurveFluxLine(0,
+         FourQubitCurveFluxLine *topStraightFLine = new FourQubitCurveFluxLine(rotation,
                                                                                topStraightFluxLineTranslate,
                                                                                "TopStraightFluxLine",
                                                                                log_groundPlane,
@@ -392,11 +396,13 @@ void FourQubitDetectorConstruction::SetupGeometry()
             }
          }
 
-         //--------------------
-         G4ThreeVector bottomStraightFluxLineTranslate(dp_topCenterFluxLineOffsetX, -1 * dp_topCenterFluxLineOffsetY, 0);
+         //-------------------- bottom left
+         G4ThreeVector bottomStraightFluxLineTranslate(dp_bottomLeftFluxLineOffsetX, -1 * dp_bottomLeftFluxLineOffsetY, 0);
          G4RotationMatrix *rotBottomCenter = new G4RotationMatrix();
          rotBottomCenter->rotateZ(180. * deg);
-         FourQubitStraightFluxLine *bottomStraightFLine = new FourQubitStraightFluxLine(rotBottomCenter,
+         rotBottomCenter->rotateY(180. * deg);
+
+         FourQubitCurveFluxLine *bottomStraightFLine = new FourQubitCurveFluxLine(rotBottomCenter,
                                                                                         bottomStraightFluxLineTranslate,
                                                                                         "BottomStraightFluxLine",
                                                                                         log_groundPlane,
@@ -422,138 +428,609 @@ void FourQubitDetectorConstruction::SetupGeometry()
             }
          }
 
-         //--------------------
-         // Corner flux line 1
-         G4ThreeVector topLeftCornerFluxLineTranslate(dp_topLeftFluxLineOffsetX, dp_topLeftFluxLineOffsetY, 0);
-         G4RotationMatrix *rotTopLeftCenter = new G4RotationMatrix();
-         rotTopLeftCenter->rotateZ(0. * deg);
-         FourQubitCornerFluxLine *topLeftCornerFLine = new FourQubitCornerFluxLine(rotTopLeftCenter,
-                                                                                   topLeftCornerFluxLineTranslate,
-                                                                                   "GroundPlane_TopLeftCornerFluxLine",
-                                                                                   log_groundPlane,
-                                                                                   false,
-                                                                                   0,
-                                                                                   checkOverlaps);
-
-         G4LogicalVolume *log_topLeftCornerFline = topLeftCornerFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_topLeftCornerFline = topLeftCornerFLine->GetPhysicalVolume();
+         //-------------------- bottom right
+         G4ThreeVector bottomRightFluxLineTranslate(dp_bottomRightFluxLineOffsetX, -1 * dp_bottomRightFluxLineOffsetY, 0);
+         G4RotationMatrix *rotBottomRight = new G4RotationMatrix();
+         rotBottomRight->rotateZ(180. * deg);
+         FourQubitCurveFluxLine *bottomRightFLine = new FourQubitCurveFluxLine(rotBottomRight,
+                                                                                        bottomRightFluxLineTranslate,
+                                                                                        "bottomRightFluxLine",
+                                                                                        log_groundPlane,
+                                                                                        false,
+                                                                                        0,
+                                                                                        checkOverlaps);
+         G4LogicalVolume *log_bottomRightFline = bottomRightFLine->GetLogicalVolume();
+         G4VPhysicalVolume *phys_bottomRightFline = bottomRightFLine->GetPhysicalVolume();
 
          // Do the logical border creation now
-         for (int iSubVol = 0; iSubVol < topLeftCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         for (int iSubVol = 0; iSubVol < bottomRightFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
          {
-            std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+            std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
 
-            std::string tempName = "border_siliconChip_" + std::get<1>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-            if (std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+            std::string tempName = "border_siliconChip_" + std::get<1>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+            if (std::get<0>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
             {
-               G4CMPLogicalBorderSurface *border_siliconChip_topLeftCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+               G4CMPLogicalBorderSurface *border_siliconChip_bottomRightFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
             }
-            if (std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+            if (std::get<0>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
             {
-               G4CMPLogicalBorderSurface *border_siliconChip_topLeftCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+               G4CMPLogicalBorderSurface *border_siliconChip_bottomRightFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
             }
          }
 
-         //--------------------
-         // Corner flux line 2
-         G4ThreeVector topRightCornerFluxLineTranslate(-1 * dp_topLeftFluxLineOffsetX, dp_topLeftFluxLineOffsetY, 0);
-         G4RotationMatrix *rotTopRightCenter = new G4RotationMatrix();
-         rotTopRightCenter->rotateY(180. * deg);
-         FourQubitCornerFluxLine *topRightCornerFLine = new FourQubitCornerFluxLine(rotTopRightCenter,
-                                                                                    topRightCornerFluxLineTranslate,
-                                                                                    "GroundPlane_TopRightCornerFluxLine",
-                                                                                    log_groundPlane,
-                                                                                    false,
-                                                                                    0,
-                                                                                    checkOverlaps);
-         G4LogicalVolume *log_topRightCornerFline = topRightCornerFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_topRightCornerFline = topRightCornerFLine->GetPhysicalVolume();
+         // //--------------------
+         // // Corner flux line 1
+         // G4ThreeVector topLeftCornerFluxLineTranslate(dp_topLeftFluxLineOffsetX, dp_topLeftFluxLineOffsetY, 0);
+         // G4RotationMatrix *rotTopLeftCenter = new G4RotationMatrix();
+         // rotTopLeftCenter->rotateZ(0. * deg);
+         // FourQubitCornerFluxLine *topLeftCornerFLine = new FourQubitCornerFluxLine(rotTopLeftCenter,
+         //                                                                           topLeftCornerFluxLineTranslate,
+         //                                                                           "GroundPlane_TopLeftCornerFluxLine",
+         //                                                                           log_groundPlane,
+         //                                                                           false,
+         //                                                                           0,
+         //                                                                           checkOverlaps);
 
-         // Do the logical border creation now
-         for (int iSubVol = 0; iSubVol < topRightCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         // G4LogicalVolume *log_topLeftCornerFline = topLeftCornerFLine->GetLogicalVolume();
+         // G4VPhysicalVolume *phys_topLeftCornerFline = topLeftCornerFLine->GetPhysicalVolume();
+
+         // // Do the logical border creation now
+         // for (int iSubVol = 0; iSubVol < topLeftCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         // {
+         //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         //    std::string tempName = "border_siliconChip_" + std::get<1>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         //    if (std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_topLeftCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         //    }
+         //    if (std::get<0>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_topLeftCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         //    }
+         // }
+
+         // //--------------------
+         // // Corner flux line 2
+         // G4ThreeVector topRightCornerFluxLineTranslate(-1 * dp_topLeftFluxLineOffsetX, dp_topLeftFluxLineOffsetY, 0);
+         // G4RotationMatrix *rotTopRightCenter = new G4RotationMatrix();
+         // rotTopRightCenter->rotateY(180. * deg);
+         // FourQubitCornerFluxLine *topRightCornerFLine = new FourQubitCornerFluxLine(rotTopRightCenter,
+         //                                                                            topRightCornerFluxLineTranslate,
+         //                                                                            "GroundPlane_TopRightCornerFluxLine",
+         //                                                                            log_groundPlane,
+         //                                                                            false,
+         //                                                                            0,
+         //                                                                            checkOverlaps);
+         // G4LogicalVolume *log_topRightCornerFline = topRightCornerFLine->GetLogicalVolume();
+         // G4VPhysicalVolume *phys_topRightCornerFline = topRightCornerFLine->GetPhysicalVolume();
+
+         // // Do the logical border creation now
+         // for (int iSubVol = 0; iSubVol < topRightCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         // {
+         //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         //    std::string tempName = "border_siliconChip_" + std::get<1>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         //    if (std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_topRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         //    }
+         //    if (std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_topRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         //    }
+         // }
+
+         // //--------------------
+         // // Corner flux line 3
+         // G4ThreeVector bottomLeftCornerFluxLineTranslate(dp_topLeftFluxLineOffsetX, -1 * dp_topLeftFluxLineOffsetY, 0);
+         // G4RotationMatrix *rotBottomLeftCenter = new G4RotationMatrix();
+         // rotBottomLeftCenter->rotateX(180. * deg);
+         // FourQubitCornerFluxLine *bottomLeftCornerFLine = new FourQubitCornerFluxLine(rotBottomLeftCenter,
+         //                                                                              bottomLeftCornerFluxLineTranslate,
+         //                                                                              "BottomLeftCornerFluxLine",
+         //                                                                              log_groundPlane,
+         //                                                                              false,
+         //                                                                              0,
+         //                                                                              checkOverlaps);
+         // G4LogicalVolume *log_bottomLeftCornerFline = bottomLeftCornerFLine->GetLogicalVolume();
+         // G4VPhysicalVolume *phys_bottomLeftCornerFline = bottomLeftCornerFLine->GetPhysicalVolume();
+
+         // // Do the logical border creation now
+         // for (int iSubVol = 0; iSubVol < bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         // {
+         //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         //    if (std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_bottomLeftCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         //    }
+         //    if (std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_bottomLeftCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         //    }
+         // }
+
+         // //--------------------
+         // // Corner flux line 4
+         // G4ThreeVector bottomRightCornerFluxLineTranslate(-1 * dp_topLeftFluxLineOffsetX, -1 * dp_topLeftFluxLineOffsetY, 0);
+         // G4RotationMatrix *rotBottomRightCenter = new G4RotationMatrix();
+         // rotBottomRightCenter->rotateX(180. * deg);
+         // rotBottomRightCenter->rotateY(180. * deg);
+         // FourQubitCornerFluxLine *bottomRightCornerFLine = new FourQubitCornerFluxLine(rotBottomRightCenter,
+         //                                                                               bottomRightCornerFluxLineTranslate,
+         //                                                                               "BottomRightCornerFluxLine",
+         //                                                                               log_groundPlane,
+         //                                                                               false,
+         //                                                                               0,
+         //                                                                               checkOverlaps);
+         // G4LogicalVolume *log_bottomRightCornerFline = bottomRightCornerFLine->GetLogicalVolume();
+         // G4VPhysicalVolume *phys_bottomRightCornerFline = bottomRightCornerFLine->GetPhysicalVolume();
+
+         // // Do the logical border creation now
+         // for (int iSubVol = 0; iSubVol < bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         // {
+         //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+
+         //    if (std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_bottomRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         //    }
+
+         //    if (std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         //    {
+         //       G4CMPLogicalBorderSurface *border_siliconChip_bottomRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         //    }
+         // }
+      }
+
+      // // transmon
+      // //--------------------
+      // G4ThreeVector locateTransmon0(1.43*mm, 1.17*mm, 0);
+      
+      // FourQubitTransmon *topTransmon = new FourQubitTransmon(0,
+      //                                                       locateTransmon0,
+      //                                                       "Transmon",
+      //                                                       log_groundPlane,
+      //                                                       false,
+      //                                                       0,
+      //                                                       checkOverlaps);
+      // G4LogicalVolume *log_topTransmon = topTransmon->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_topTransmon = topTransmon->GetPhysicalVolume();
+
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < topTransmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
+      //              << " with material " << std::get<0>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_topTransmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+      //                                        std::get<2>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_topTransmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+      //                                        std::get<2>(topTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+      // G4ThreeVector locateTransmon1(0.5*mm, -1.0*mm, 0);
+      
+      // FourQubitTransmon *bottomTransmon = new FourQubitTransmon(0,
+      //                                                       locateTransmon1,
+      //                                                       "Transmon",
+      //                                                       log_groundPlane,
+      //                                                       false,
+      //                                                       0,
+      //                                                       checkOverlaps);
+      // G4LogicalVolume *log_bottomTransmon = bottomTransmon->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_bottomTransmon = bottomTransmon->GetPhysicalVolume();
+
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < bottomTransmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
+      //              << " with material " << std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomTransmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+      //                                        std::get<2>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomTransmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+      //                                        std::get<2>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+      // // Xmon
+      // //--------------------
+      // G4ThreeVector locateXmon0(-1.0 * mm, 1.0 * mm, 0);
+
+      // FourQubitXmon *topXmon = new FourQubitXmon(0,
+      //                                            locateXmon0,
+      //                                            "Xmon",
+      //                                            log_groundPlane,
+      //                                            false,
+      //                                            0,
+      //                                            checkOverlaps);
+      // G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
+
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < topXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol])
+      //              << " with material " << std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_topXmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                  std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_topXmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                      std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+      // G4ThreeVector locateXmon1(-1.0 * mm, -1.0 * mm, 0);
+      // G4RotationMatrix *rotBottomRightXmon = new G4RotationMatrix();
+      // rotBottomRightXmon->rotateX(180. * deg);
+
+      // FourQubitXmon *bottomXmon = new FourQubitXmon(rotBottomRightXmon,
+      //                                            locateXmon1,
+      //                                            "Xmon",
+      //                                            log_groundPlane,
+      //                                            false,
+      //                                            0,
+      //                                            checkOverlaps);
+      // G4LogicalVolume *log_bottomXmon = bottomXmon->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_bottomXmon = bottomXmon->GetPhysicalVolume();
+
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < bottomXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol])
+      //              << " with material " << std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomXomEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                  std::get<2>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomXomConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                      std::get<2>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+      // Resonator
+      //--------------------
+      G4ThreeVector locatetopResonator0(-0.39 * mm, 0.39 * mm, 0);
+
+      FourQubitResonator *topResonator0 = new FourQubitResonator(0,
+                                                                 locatetopResonator0,
+                                                                 "Resonator0",
+                                                                 log_groundPlane,
+                                                                 false,
+                                                                 0,
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 546 * um);
+      G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
+      G4ThreeVector anchorq0 =  topResonator0->GetResEndVector() + locatetopResonator0;
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < topResonator0->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
          {
-            std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
-
-            std::string tempName = "border_siliconChip_" + std::get<1>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-            if (std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_topRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
-            }
-            if (std::get<0>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_topRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(topRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
-            }
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonator0Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                             std::get<2>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
          }
-
-         //--------------------
-         // Corner flux line 3
-         G4ThreeVector bottomLeftCornerFluxLineTranslate(dp_topLeftFluxLineOffsetX, -1 * dp_topLeftFluxLineOffsetY, 0);
-         G4RotationMatrix *rotBottomLeftCenter = new G4RotationMatrix();
-         rotBottomLeftCenter->rotateX(180. * deg);
-         FourQubitCornerFluxLine *bottomLeftCornerFLine = new FourQubitCornerFluxLine(rotBottomLeftCenter,
-                                                                                      bottomLeftCornerFluxLineTranslate,
-                                                                                      "BottomLeftCornerFluxLine",
-                                                                                      log_groundPlane,
-                                                                                      false,
-                                                                                      0,
-                                                                                      checkOverlaps);
-         G4LogicalVolume *log_bottomLeftCornerFline = bottomLeftCornerFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_bottomLeftCornerFline = bottomLeftCornerFLine->GetPhysicalVolume();
-
-         // Do the logical border creation now
-         for (int iSubVol = 0; iSubVol < bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+         if (std::get<0>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
          {
-            std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
-
-            std::string tempName = "border_siliconChip_" + std::get<1>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-            if (std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_bottomLeftCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
-            }
-            if (std::get<0>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_bottomLeftCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomLeftCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
-            }
-         }
-
-         //--------------------
-         // Corner flux line 4
-         G4ThreeVector bottomRightCornerFluxLineTranslate(-1 * dp_topLeftFluxLineOffsetX, -1 * dp_topLeftFluxLineOffsetY, 0);
-         G4RotationMatrix *rotBottomRightCenter = new G4RotationMatrix();
-         rotBottomRightCenter->rotateX(180. * deg);
-         rotBottomRightCenter->rotateY(180. * deg);
-         FourQubitCornerFluxLine *bottomRightCornerFLine = new FourQubitCornerFluxLine(rotBottomRightCenter,
-                                                                                       bottomRightCornerFluxLineTranslate,
-                                                                                       "BottomRightCornerFluxLine",
-                                                                                       log_groundPlane,
-                                                                                       false,
-                                                                                       0,
-                                                                                       checkOverlaps);
-         G4LogicalVolume *log_bottomRightCornerFline = bottomRightCornerFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_bottomRightCornerFline = bottomRightCornerFLine->GetPhysicalVolume();
-
-         // Do the logical border creation now
-         for (int iSubVol = 0; iSubVol < bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
-         {
-            std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << " with material " << std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
-
-            std::string tempName = "border_siliconChip_" + std::get<1>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-
-            if (std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_bottomRightCornerFluxLineEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
-            }
-
-            if (std::get<0>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
-            {
-               G4CMPLogicalBorderSurface *border_siliconChip_bottomRightCornerFluxLineConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, std::get<2>(bottomRightCornerFLine->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
-            }
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonator0Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                                 std::get<2>(topResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
          }
       }
 
+      G4ThreeVector locatetopResonator1(1.17 * mm, 0.39 * mm, 0);
+
+      FourQubitResonator *topResonator1 = new FourQubitResonator(0,
+                                                                 locatetopResonator1,
+                                                                 "Resonator1",
+                                                                 log_groundPlane,
+                                                                 false,
+                                                                 0,
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 312 * um);
+      G4LogicalVolume *log_topResonator1 = topResonator1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_topResonator1 = topResonator1->GetPhysicalVolume();
+      G4ThreeVector anchorq1 =  topResonator1->GetResEndVector() + locatetopResonator1;
+
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < topResonator1->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonator1Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                             std::get<2>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topResonator1Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                                 std::get<2>(topResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }
+
+      // bottom resonators
+      G4ThreeVector locatebottomResonator0(-1.17 * mm, -0.39 * mm, 0);
+      G4RotationMatrix *rotBottomResonator0 = new G4RotationMatrix();
+      rotBottomResonator0->rotateZ(180. * deg);
+
+      FourQubitResonator *bottomResonator0 = new FourQubitResonator(rotBottomResonator0,
+                                                                 locatebottomResonator0,
+                                                                 "Resonator0",
+                                                                 log_groundPlane,
+                                                                 false,
+                                                                 0,
+                                                                 checkOverlaps,
+                                                                 7,
+                                                                 dp_shlConductorDimX);
+      G4LogicalVolume *log_bottomResonator0 = bottomResonator0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomResonator0 = bottomResonator0->GetPhysicalVolume();
+      G4ThreeVector anchorq2 = *rotBottomResonator0 * ( bottomResonator0->GetResEndVector() ) + locatebottomResonator0;
+
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < bottomResonator0->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomResonator0Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                             std::get<2>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomResonator0Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                                 std::get<2>(bottomResonator0->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }
+   
+      G4ThreeVector locatebottomResonator1(0.39 * mm, -0.39 * mm, 0);
+      G4RotationMatrix *rotBottomResonator1 = new G4RotationMatrix();
+      rotBottomResonator1->rotateZ(180. * deg);
+
+      FourQubitResonator *bottomResonator1 = new FourQubitResonator(rotBottomResonator1,
+                                                                 locatebottomResonator1,
+                                                                 "Resonator1",
+                                                                 log_groundPlane,
+                                                                 false,
+                                                                 0,
+                                                                 checkOverlaps,
+                                                                 6,
+                                                                 624*um);
+      G4LogicalVolume *log_bottomResonator1 = bottomResonator1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomResonator1 = bottomResonator1->GetPhysicalVolume();
+      G4ThreeVector anchorq3 =  *rotBottomResonator1 * bottomResonator1->GetResEndVector() + locatebottomResonator1;
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < bottomResonator1->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomResonator1Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                             std::get<2>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomResonator1Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                                 std::get<2>(bottomResonator1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }
+
+      // other pieces
+      /////
+      // top q0
+      // q0c0
+      G4RotationMatrix *rotq0c0 = new G4RotationMatrix();
+      rotq0c0->rotateZ(0.0 * deg);
+      
+      anchorq0 = anchorq0 + G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
+      FourQubitCurve *q0c0 = new FourQubitCurve(rotq0c0,
+                                                anchorq0,
+                                                "q0c0",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, dp_resonatorCurveCentralRadius, 180, 90);
+
+      G4LogicalVolume *log_q0c0 = q0c0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q0c0 = q0c0->GetPhysicalVolume();
+
+      // q0l0
+      G4RotationMatrix *rotq0s0 = new G4RotationMatrix();
+      rotq0s0->rotateZ(90. * deg);
+
+      anchorq0 = anchorq0 + G4ThreeVector(-1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * 130 * um, 0);
+
+      FourQubitStraight *q0s0 = new FourQubitStraight(rotq0s0,
+                                                      anchorq0,
+                                                      "q0s0",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, 130 * um);
+      G4LogicalVolume *log_q0s0 = q0s0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q0s0 = q0s0->GetPhysicalVolume();
+
+            // Xmon
+      //--------------------
+      //G4ThreeVector locateXmon0(-1.0 * mm, 1.0 * mm, 0);
+      G4ThreeVector locateXmon0 = anchorq0 + G4ThreeVector(0.0, (0.5 * 130 * um)+(0.5*dp_xmonBaseNbLayerDimY), 0);
+
+      FourQubitXmon *topXmon = new FourQubitXmon(0,
+                                                 locateXmon0,
+                                                 "Xmon",
+                                                 log_groundPlane,
+                                                 false,
+                                                 0,
+                                                 checkOverlaps);
+      G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
+      G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < topXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topXmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                       std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_topXmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                           std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }
+
+
+      // q1
+      //G4ThreeVector anchorq1(1.3755 * mm, 0.692 * mm, 0);
+
+      // c1
+      // G4ThreeVector locatebottomCurve1(1.3755 * mm, 0.692 * mm, 0);
+      // G4RotationMatrix *rotBottomCurve1 = new G4RotationMatrix();
+      // rotBottomCurve1->rotateZ(180. * deg);
+
+      // FourQubitCurve *bottomCurve1 = new FourQubitCurve(rotBottomCurve1,
+      //                                                               locatebottomCurve1,
+      //                                                               "Curve1",
+      //                                                               log_groundPlane,
+      //                                                               false,
+      //                                                               0,
+      //                                                               checkOverlaps, 45*um, 90, 180);
+      // G4LogicalVolume *log_bottomCurve1 = bottomCurve1->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_bottomCurve1 = bottomCurve1->GetPhysicalVolume();
+
+      // // line 1
+      // G4ThreeVector locatebottomStraight1(-0.5*312*um, dp_resonatorCurveCentralRadius, 0);
+      // G4RotationMatrix *rotBottomStraight1 = new G4RotationMatrix();
+      // rotBottomStraight1->rotateZ(180. * deg);
+
+      // FourQubitStraight *bottomStraight1 = new FourQubitStraight(rotBottomStraight1,
+      //                                                               anchorq1+locatebottomStraight1,
+      //                                                               "Straight1",
+      //                                                               log_groundPlane,
+      //                                                               false,
+      //                                                               0,
+      //                                                               checkOverlaps, 312*um);
+      // G4LogicalVolume *log_bottomStraight1 = bottomStraight1->GetLogicalVolume();
+      // G4VPhysicalVolume *phys_bottomStraight1 = bottomStraight1->GetPhysicalVolume();
+      // anchorq1 = anchorq1+locatebottomStraight1;
+
+      // q1c0
+      anchorq1 = anchorq1 + G4ThreeVector(0.0, dp_resonatorCurveCentralRadius, 0);
+      G4RotationMatrix *rotq1c0 = new G4RotationMatrix();
+      rotq1c0->rotateZ(180. * deg);
+
+      FourQubitCurve *q1c0 = new FourQubitCurve(rotq1c0,
+                                                anchorq1,
+                                                "q1c0",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, 45 * um, 0, 90);
+      G4LogicalVolume *log_q1c0 = q1c0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q1c0 = q1c0->GetPhysicalVolume();
+
+      // q1s0
+      anchorq1 = anchorq1 + G4ThreeVector(-1.0 * dp_resonatorCurveCentralRadius, 0.5 * 320 * um, 0);
+      G4RotationMatrix *rotq1s0 = new G4RotationMatrix();
+      rotq1s0->rotateZ(90. * deg);
+
+      FourQubitStraight *q1s0 = new FourQubitStraight(rotq1s0,
+                                                      anchorq1,
+                                                      "q1s0",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, 320 * um);
+      G4LogicalVolume *log_q1s0 = q1s0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q1s0 = q1s0->GetPhysicalVolume();
+
+      // q1c1
+      anchorq1 = anchorq1 + G4ThreeVector(dp_resonatorCurveCentralRadius, 0.5 * 320 * um, 0);
+      G4RotationMatrix *rotq1c1 = new G4RotationMatrix();
+      rotq1c1->rotateZ(270. * deg);
+
+      FourQubitCurve *q1c1 = new FourQubitCurve(rotq1c1,
+                                                anchorq1,
+                                                "q1c1",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, 45 * um, 0, 90);
+      G4LogicalVolume *log_q1c1 = q1c1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q1c1 = q1c1->GetPhysicalVolume();
+
+      // q1s1
+      G4float q1s1len = 200 * um;
+      anchorq1 = anchorq1 + G4ThreeVector(0.5 * q1s1len, dp_resonatorCurveCentralRadius, 0);
+
+      G4RotationMatrix *rotq1s1 = new G4RotationMatrix();
+      rotq1s1->rotateZ(180. * deg);
+
+      FourQubitStraight *q1s1 = new FourQubitStraight(rotq1s1,
+                                                      anchorq1,
+                                                      "q1s1",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, q1s1len);
+      G4LogicalVolume *log_q1s1 = q1s1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q1s1 = q1s1->GetPhysicalVolume();
+
       // transmon
       //--------------------
-      G4ThreeVector locateTransmon0(1.0*mm, 1.0*mm, 0);
+      G4ThreeVector locateTransmon0 =  anchorq1 + G4ThreeVector(0.5 * q1s1len + (0.5*dp_transmonFieldDimX), 0, 0);
       
       FourQubitTransmon *topTransmon = new FourQubitTransmon(0,
                                                             locateTransmon0,
@@ -562,8 +1039,8 @@ void FourQubitDetectorConstruction::SetupGeometry()
                                                             false,
                                                             0,
                                                             checkOverlaps);
-      G4LogicalVolume *log_topStraightFline = topTransmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_topStraightFline = topTransmon->GetPhysicalVolume();
+      G4LogicalVolume *log_topTransmon = topTransmon->GetLogicalVolume();
+      G4VPhysicalVolume *phys_topTransmon = topTransmon->GetPhysicalVolume();
 
       // Do the logical border creation now
       for (int iSubVol = 0; iSubVol < topTransmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
@@ -584,72 +1061,220 @@ void FourQubitDetectorConstruction::SetupGeometry()
          }
       }
 
-      // Xmon
-      //--------------------
-      G4ThreeVector locateXmon0(-1.0*mm, 1.0*mm, 0);
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < bottomStraight1->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol])
+      //              << " with material " << std::get<0>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomStraight1Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                           std::get<2>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomStraight1Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                               std::get<2>(bottomStraight1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+
+
+
+
+      // // Do the logical border creation now
+      // for (int iSubVol = 0; iSubVol < bottomCurve1->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      // {
+      //    std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol])
+      //              << " with material " << std::get<0>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+      //    std::string tempName = "border_siliconChip_" + std::get<1>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+      //    if (std::get<0>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomCurve1Empty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                           std::get<2>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+      //    }
+      //    if (std::get<0>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+      //    {
+      //       G4CMPLogicalBorderSurface *border_siliconChip_bottomCurve1Conductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+      //                                                                                                               std::get<2>(bottomCurve1->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+      //    }
+      // }
+
+      // bq1
+      //////
+      // q2c0
+      G4RotationMatrix *rotq2c0 = new G4RotationMatrix();
+      rotq2c0->rotateZ(0.0 * deg);
       
-      FourQubitXmon *topXmon = new FourQubitXmon(0,
-                                                            locateXmon0,
-                                                            "Xmon",
+      anchorq2 = anchorq2 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
+      FourQubitCurve *q2c0 = new FourQubitCurve(rotq2c0,
+                                                anchorq2,
+                                                "q2c0",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, dp_resonatorCurveCentralRadius, 0, 90);
+
+      G4LogicalVolume *log_q2c0 = q2c0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q2c0 = q2c0->GetPhysicalVolume();
+
+      // q2l0
+      G4RotationMatrix *rotq2s0 = new G4RotationMatrix();
+      rotq2s0->rotateZ(90. * deg);
+
+      anchorq2 = anchorq2 - G4ThreeVector(-1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * 130 * um, 0);
+
+      FourQubitStraight *q2s0 = new FourQubitStraight(rotq2s0,
+                                                      anchorq2,
+                                                      "q2s0",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, 130 * um);
+      G4LogicalVolume *log_q2s0 = q2s0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q2s0 = q2s0->GetPhysicalVolume();
+
+      G4ThreeVector locateXmon1 = anchorq2 - G4ThreeVector(0.0, (0.5 * 130 * um)+(0.5*dp_xmonBaseNbLayerDimY), 0);
+      G4RotationMatrix *rotBottomRightXmon = new G4RotationMatrix();
+      rotBottomRightXmon->rotateX(180. * deg);
+
+      FourQubitXmon *bottomXmon = new FourQubitXmon(rotBottomRightXmon,
+                                                 locateXmon1,
+                                                 "Xmon",
+                                                 log_groundPlane,
+                                                 false,
+                                                 0,
+                                                 checkOverlaps);
+      G4LogicalVolume *log_bottomXmon = bottomXmon->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomXmon = bottomXmon->GetPhysicalVolume();
+
+      // Do the logical border creation now
+      for (int iSubVol = 0; iSubVol < bottomXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      {
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol])
+                   << " with material " << std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+
+         std::string tempName = "border_siliconChip_" + std::get<1>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomXomEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                       std::get<2>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+         }
+         if (std::get<0>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         {
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomXomConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip,
+                                                                                                           std::get<2>(bottomXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+         }
+      }
+
+
+      //
+      // q3
+      // q3c0
+      G4RotationMatrix *rotq3c0 = new G4RotationMatrix();
+      rotq3c0->rotateZ(0.0 * deg);
+      
+      anchorq3 = anchorq3 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
+      FourQubitCurve *q3c0 = new FourQubitCurve(rotq3c0,
+                                                anchorq3,
+                                                "q3c0",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, dp_resonatorCurveCentralRadius, 90, 90);
+
+      G4LogicalVolume *log_q3c0 = q3c0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q3c0 = q3c0->GetPhysicalVolume();
+
+      // q2l0
+      G4RotationMatrix *rotq3s0 = new G4RotationMatrix();
+      rotq3s0->rotateZ(90. * deg);
+
+      G4float q3s0len =  350 * um;
+      anchorq3 = anchorq3 - G4ThreeVector(1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * q3s0len, 0);
+
+      FourQubitStraight *q3s0 = new FourQubitStraight(rotq3s0,
+                                                      anchorq3,
+                                                      "q3s0",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, q3s0len);
+      G4LogicalVolume *log_q3s0 = q3s0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q3s0 = q3s0->GetPhysicalVolume();
+
+      // q3c1
+      G4RotationMatrix *rotq3c1 = new G4RotationMatrix();
+      rotq3c1->rotateZ(0.0 * deg);
+      
+      //anchorq3 = anchorq3 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
+      anchorq3 = anchorq3 + G4ThreeVector(dp_resonatorCurveCentralRadius + 0.5*dp_tlCouplingEmptyDimY, -0.5 * q3s0len, 0);  // fix later
+
+      FourQubitCurve *q3c1 = new FourQubitCurve(rotq3c1,
+                                                anchorq3,
+                                                "q3c1",
+                                                log_groundPlane,
+                                                false,
+                                                0,
+                                                checkOverlaps, dp_resonatorCurveCentralRadius, 180, 90);
+
+      G4LogicalVolume *log_q3c1 = q3c1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q3c1 = q3c1->GetPhysicalVolume();
+
+      // q2l1
+      G4RotationMatrix *rotq3s1 = new G4RotationMatrix();
+      rotq3s1->rotateZ(0. * deg);
+
+      G4float q3s1len =  350 * um;
+      anchorq3 = anchorq3 + G4ThreeVector(0.5 * q3s1len, -1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0);
+
+      FourQubitStraight *q3s1 = new FourQubitStraight(rotq3s1,
+                                                      anchorq3,
+                                                      "q3s1",
+                                                      log_groundPlane,
+                                                      false,
+                                                      0,
+                                                      checkOverlaps, q3s1len);
+      G4LogicalVolume *log_q3s1 = q3s1->GetLogicalVolume();
+      G4VPhysicalVolume *phys_q3s1 = q3s1->GetPhysicalVolume();
+
+
+      G4ThreeVector locateTransmon1 = anchorq3 + G4ThreeVector((0.5 * q3s1len)+(0.5*dp_transmonFieldDimY), 0.0, 0);
+      
+      FourQubitTransmon *bottomTransmon = new FourQubitTransmon(0,
+                                                            locateTransmon1,
+                                                            "Transmon",
                                                             log_groundPlane,
                                                             false,
                                                             0,
                                                             checkOverlaps);
-      G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
+      G4LogicalVolume *log_bottomTransmon = bottomTransmon->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomTransmon = bottomTransmon->GetPhysicalVolume();
 
       // Do the logical border creation now
-      for (int iSubVol = 0; iSubVol < topXmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
+      for (int iSubVol = 0; iSubVol < bottomTransmon->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
       {
-         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
-                   << " with material " << std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
+         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
+                   << " with material " << std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
 
-         std::string tempName = "border_siliconChip_" + std::get<1>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
+         std::string tempName = "border_siliconChip_" + std::get<1>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+         if (std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
          {
-            G4CMPLogicalBorderSurface *border_siliconChip_topXmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
-                                             std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomTransmonEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
          }
-         if (std::get<0>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
+         if (std::get<0>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
          {
-            G4CMPLogicalBorderSurface *border_siliconChip_topXmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
-                                             std::get<2>(topXmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+            G4CMPLogicalBorderSurface *border_siliconChip_bottomTransmonConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
+                                             std::get<2>(bottomTransmon->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
          }
-      }      
+      }
 
-   // Resonator
-      //--------------------
-      G4ThreeVector locateResonator0(-1.0*mm, -1.0*mm, 0);
-      
-      FourQubitResonator *topResonator = new FourQubitResonator(0,
-                                                            locateResonator0,
-                                                            "Resonator",
-                                                            log_groundPlane,
-                                                            false,
-                                                            0,
-                                                            checkOverlaps);
-      G4LogicalVolume *log_Resonator = topResonator->GetLogicalVolume();
-      G4VPhysicalVolume *phys_Resonator = topResonator->GetPhysicalVolume();
+   } // end
 
-      // Do the logical border creation now
-      for (int iSubVol = 0; iSubVol < topResonator->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
-      {
-         std::cout << "TLine sub volume names (to be used for boundaries): " << std::get<1>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
-                   << " with material " << std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]) << std::endl;
-
-         std::string tempName = "border_siliconChip_" + std::get<1>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-         if (std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
-         {
-            G4CMPLogicalBorderSurface *border_siliconChip_topResonatorEmpty = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
-                                             std::get<2>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
-         }
-         if (std::get<0>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
-         {
-            G4CMPLogicalBorderSurface *border_siliconChip_topResonatorConductor = new G4CMPLogicalBorderSurface(tempName, phys_siliconChip, 
-                                             std::get<2>(topResonator->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
-         }
-      }      
-   }
 
    //---------------------------------------------------------------------------------------------------------------------
    //---------------------------------------------------------------------------------------------------------------------
