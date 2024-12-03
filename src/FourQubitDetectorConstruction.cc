@@ -1,16 +1,11 @@
 /***********************************************************************\
  * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
+ * License version 3 or later.                                         *
 \***********************************************************************/
 
-/// \file exoticphysics/phonon/src/PhononDetectorConstruction.cc \brief
-/// Implementation of the PhononDetectorConstruction class
+/// \file FourQubitDetectorConstruction.cc \brief
+/// Implementation of the DetectorConstruction class
 //
-// $Id: a2016d29cc7d1e75482bfc623a533d20b60390da $
-//
-// 20140321  Drop passing placement transform to G4LatticePhysical
-// 20211207  Replace G4Logical*Surface with G4CMP-specific versions.
-// 20220809  [ For M. Hui ] -- Add frequency dependent surface properties.
 
 #include "FourQubitDetectorConstruction.hh"
 #include "FourQubitSensitivity.hh"
@@ -31,6 +26,7 @@
 #include "G4CMPElectrodeSensitivity.hh"
 #include "G4CMPLogicalBorderSurface.hh"
 #include "G4CMPSurfaceProperty.hh"
+
 #include "G4Box.hh"
 #include "G4Colour.hh"
 #include "G4FieldManager.hh"
@@ -98,8 +94,11 @@ G4VPhysicalVolume *FourQubitDetectorConstruction::Construct()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
-void FourQubitDetectorConstruction::LogicalBorderCreation(auto * ComponentModel, G4VPhysicalVolume * PhysicalSiVolume, G4CMPSurfaceProperty *SiNbInterface, G4CMPSurfaceProperty *SiVacuumInterface)
-{ // Do the logical border creation now
+void FourQubitDetectorConstruction::LogicalBorderCreation(auto *ComponentModel,
+                                                          G4VPhysicalVolume *PhysicalSiVolume, G4CMPSurfaceProperty *SiNbInterface,
+                                                          G4CMPSurfaceProperty *SiVacuumInterface)
+{
+   // Do the logical border creation now
    for (int iSubVol = 0; iSubVol < ComponentModel->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol)
    {
       std::cout << "Sub volume names (to be used for boundaries): " << std::get<1>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
@@ -109,12 +108,14 @@ void FourQubitDetectorConstruction::LogicalBorderCreation(auto * ComponentModel,
       if (std::get<0>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos)
       {
          G4CMPLogicalBorderSurface *border_siliconChip_Empty = new G4CMPLogicalBorderSurface(tempName, PhysicalSiVolume,
-                                                                                                    std::get<2>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiVacuumInterface);
+                                                                                             std::get<2>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), 
+                                                                                             fSiVacuumInterface);
       }
       if (std::get<0>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos)
       {
          G4CMPLogicalBorderSurface *border_siliconChip_Conductor = new G4CMPLogicalBorderSurface(tempName, PhysicalSiVolume,
-                                                                                                        std::get<2>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), fSiNbInterface);
+                                                                                                 std::get<2>(ComponentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), 
+                                                                                                 fSiNbInterface);
       }
    }
 }
