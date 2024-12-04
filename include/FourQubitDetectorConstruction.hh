@@ -26,6 +26,7 @@ private:
   void DefineMaterials();
   void SetupGeometry();
   void AttachPhononSensor(G4CMPSurfaceProperty * surfProp);
+  void LogicalBorderCreation(auto * ComponentModel, G4VPhysicalVolume * PhysicalSiVolume, G4CMPSurfaceProperty * SiNbInterface, G4CMPSurfaceProperty * SiVacuumInterface);
 
   
 private:
