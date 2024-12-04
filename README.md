@@ -7,7 +7,7 @@
 * Install G4CMP: [G4CMP Repo](https://github.com/kelseymh/G4CMP)
 
 ## Superconducting Qubit Chip Geometry
-![Four Qubit Transmon/Xmon Chip](./assets/images/foo/bar.png)
+![Four Qubit Transmon/Xmon Chip](./docs/assets/images/fourqubitmodel.PNG)
 
 
 Based on work from by Ryan Linehan, linehan3@fnal.gov
