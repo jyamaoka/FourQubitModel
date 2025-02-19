@@ -3,12 +3,15 @@
  * License version 3 or later. See G4CMP/LICENSE for the full license. *
 \***********************************************************************/
 
-// $Id: 539f524339ae53ad098a07cfa3bebd07784d23dd $
+/// \file src/FourQubitActionInitialization.cc
+/// \brief Definition of FourQubitActionInitialization class
+///   Initializes the Actions for the Simulation
+
+#include "G4CMPStackingAction.hh"
 
 #include "FourQubitActionInitialization.hh"
 #include "FourQubitPrimaryGeneratorAction.hh"
 #include "FourQubitSteppingAction.hh"
-#include "G4CMPStackingAction.hh"
 
 void FourQubitActionInitialization::Build() const {
   SetUserAction(new FourQubitPrimaryGeneratorAction);
