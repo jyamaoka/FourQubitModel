@@ -90,6 +90,8 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
   air_vis->SetVisibility(true);
   G4VisAttributes *attention_vis = new G4VisAttributes(G4Colour(1.0, 0.0, 0.0, 1.0)); // used for debuging
   attention_vis->SetVisibility(true);
+  G4VisAttributes *attention2_vis = new G4VisAttributes(G4Colour(1.0, 0.5, 0.0, 1.0)); // used for debuging
+  attention2_vis->SetVisibility(true);
 
   //------------------------------------------------------------------------------------------
   // Start with a base layer of niobium into which our objects will fit. We'll return this in the end.
@@ -108,8 +110,8 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
   G4LogicalVolume *log_baseNbLayer = new G4LogicalVolume(solid_baseNbLayer,
                                                          niobium_mat,
                                                          baseNbLayerNameLog);
-  // log_baseNbLayer->SetVisAttributes(attention_vis); //
-  log_baseNbLayer->SetVisAttributes(G4VisAttributes::Invisible); // niobium_vis);
+  log_baseNbLayer->SetVisAttributes(attention2_vis); //
+  //log_baseNbLayer->SetVisAttributes(G4VisAttributes::Invisible); // niobium_vis);
 
   // Now, create a physical volume and G4PVPlacement for storing as the final output. This is the
   // top volume.
@@ -131,7 +133,7 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
 
   //------------------------------------------------------
   // Some useful translations relative to the center of the plane in which all of this is embedded
-  G4ThreeVector brCornerOfBaseNbLayer(0.35 * dp_resonatorBaseNbLayerDimX, -0.5 * dp_resonatorBaseNbLayerDimY, 0); // Bottom right corner relative to center of the plane
+  G4ThreeVector brCornerOfBaseNbLayer(0.35 * dp_resonatorBaseNbLayerDimX, -0.5 * dp_resonatorBaseNbLayerDimY, 0.0); // Bottom right corner relative to center of the plane
   G4ThreeVector currentPoint = G4ThreeVector(-0.5 * dp_tlCouplingEmptyDimX, 0.5 * dp_tlCouplingEmptyDimY + dp_resonatorAssemblyBaseNbEdgeBottomDimY, 0.0)
     + brCornerOfBaseNbLayer; // Good for empty or conductor
 
@@ -152,8 +154,8 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
     G4LogicalVolume *log_shlEmpty = new G4LogicalVolume(solid_shlEmpty, air_mat, shlEmptyNameLog);
 
 
-    G4VPhysicalVolume *shlEmpty = new G4PVPlacement(0, currentPoint, log_shlEmpty, shlEmptyName, log_baseNbLayer, false, 0, true);
-    log_shlEmpty->SetVisAttributes(air_vis);
+    G4VPhysicalVolume *shlEmpty = new G4PVPlacement(0, currentPoint, log_shlEmpty, shlEmptyName, log_baseNbLayer, false, i, true);
+    log_shlEmpty->SetVisAttributes(attention_vis);
     fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Vacuum", shlEmptyName, shlEmpty));
 
     //------------------------------------------------------
