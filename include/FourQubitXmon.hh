@@ -10,12 +10,14 @@
 #include "FourQubitDetectorParameters.hh"
 #include "globals.hh"
 
+#include "FourQubitComponentModel.hh"
+
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4PVPlacement;
 
 /// Detector construction class to define materials and geometry.
-class FourQubitXmon
+class FourQubitXmon : public FourQubitComponentModel
 {
   public:
     FourQubitXmon();

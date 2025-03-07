@@ -13,22 +13,22 @@ class G4Material;
 class G4VPhysicalVolume;
 class G4CMPSurfaceProperty;
 class G4CMPElectrodeSensitivity;
+class FourQubitComponentModel;
 
 class FourQubitDetectorConstruction : public G4VUserDetectorConstruction {
 public:
   FourQubitDetectorConstruction();
   virtual ~FourQubitDetectorConstruction();
-  
-public:
   virtual G4VPhysicalVolume* Construct();
-  
+
 private:
   void DefineMaterials();
   void SetupGeometry();
-  void AttachPhononSensor(G4CMPSurfaceProperty * surfProp);
-  void LogicalBorderCreation(auto * ComponentModel, G4VPhysicalVolume * PhysicalSiVolume, G4CMPSurfaceProperty * SiNbInterface, G4CMPSurfaceProperty * SiVacuumInterface);
+  void AttachPhononSensor(G4CMPSurfaceProperty* surfProp);
+  void LogicalBorderCreation(FourQubitComponentModel* componentModel, G4VPhysicalVolume* physicalSiVolume, 
+                             G4CMPSurfaceProperty* siNbInterface, 
+                             G4CMPSurfaceProperty* siVacuumInterface);
 
-  
 private:
   G4Material* fLiquidHelium;
   G4Material* fGermanium;

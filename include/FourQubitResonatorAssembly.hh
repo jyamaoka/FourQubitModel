@@ -37,12 +37,14 @@
 #include "FourQubitPad.hh"
 #include "globals.hh"
 
+#include "FourQubitComponentModel.hh"
+
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4PVPlacement;
 
 /// Detector construction class to define materials and geometry.
-class FourQubitResonatorAssembly
+class FourQubitResonatorAssembly : public FourQubitComponentModel
 {
   public:
     FourQubitResonatorAssembly();
