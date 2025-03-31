@@ -1,29 +1,4 @@
 //
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
 /// \file FourQubitPad.hh
 /// \brief Definition of the class defining how a transmission line is constructed on a qubit chip
 ///        
@@ -32,7 +7,7 @@
 #define FourQubitResonatorAssembly_h 1
 
 
-//#include "G4PVPlacement.hh"
+#include "G4PVPlacement.hh"
 #include "FourQubitDetectorParameters.hh"
 #include "FourQubitPad.hh"
 #include "globals.hh"
@@ -78,7 +53,7 @@ class FourQubitResonatorAssembly : public FourQubitComponentModel
   void MakeResonatorLine(G4String pName, G4LogicalVolume * log_baseNbLayer);
   void MakeShuntCapacitorCross(G4String pName, G4LogicalVolume * log_baseNbLayer);
 
-  std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > GetListOfAllFundamentalSubVolumes();
+  std::vector< std::tuple<std::string,G4String,G4VPhysicalVolume*> > GetListOfAllFundamentalSubVolumes();
   
   protected:
 
@@ -90,7 +65,5 @@ class FourQubitResonatorAssembly : public FourQubitComponentModel
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList; //List of all fundamental sub-volumes in the transmission line. String 1 is "material_description", String 2 should be unique identifier (name of the sub-physical volume)
   
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

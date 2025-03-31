@@ -1,10 +1,7 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later.                                         *
-\***********************************************************************/
-
+//
 /// \file FourQubitDetectorConstruction.cc 
 /// \brief Implementation of the DetectorConstruction class
+//
 
 #include "FourQubitCornerFluxLine.hh"
 #include "FourQubitCurve.hh"
@@ -162,7 +159,7 @@ void FourQubitDetectorConstruction::SetupGeometry() {
    // World
    G4VSolid *solid_world = new G4Box("World", 55. * cm, 55. * cm, 55. * cm);
    G4LogicalVolume *log_world = new G4LogicalVolume(solid_world, fLiquidHelium, "World");
-   //  worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0, 0));
+   // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0, 0));
    log_world->SetVisAttributes(G4VisAttributes::Invisible);
    fWorldPhys = new G4PVPlacement(0,
                                   G4ThreeVector(),
@@ -286,7 +283,6 @@ void FourQubitDetectorConstruction::SetupGeometry() {
          LogicalBorderCreation(tLine, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
       }
 
-      //-------------------------------------------------------------------------------------------------------------------
       // Now set up a set of 6 resonator assemblies
       if (dp_useResonatorAssembly) {
          int nR = 6;
@@ -397,12 +393,14 @@ void FourQubitDetectorConstruction::SetupGeometry() {
                                                                  checkOverlaps,
                                                                  7,
                                                                  546 * um);
-      G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
+      //G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
+      //G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
       G4ThreeVector anchorq0 =  topResonator0->GetResEndVector() + locatetopResonator0;
 
+      //std::cout<<
+
       // Do the logical border creation now
-      LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+      //LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
 
       G4ThreeVector locatetopResonator1(1.17 * mm, 0.39 * mm, 0);
 

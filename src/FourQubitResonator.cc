@@ -125,6 +125,9 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
                                                           pSurfChk);
   fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Niobium", baseNbLayerName, phys_baseNbLayer));
 
+  std::cout<<"LOCATION "<< baseNbLayerNameLog << tLate << std::endl;
+
+
   //------------------------------------------------------------------------------------------
   // Resonator
 
@@ -157,7 +160,9 @@ void FourQubitResonator::ConstructResonator(G4RotationMatrix *pRot,
     G4VPhysicalVolume *shlEmpty = new G4PVPlacement(0, currentPoint, log_shlEmpty, shlEmptyName, log_baseNbLayer, false, i, true);
     log_shlEmpty->SetVisAttributes(attention_vis);
     fFundamentalVolumeList.push_back(std::tuple<std::string, G4String, G4VPhysicalVolume *>("Vacuum", shlEmptyName, shlEmpty));
-
+    
+    std::cout<<"LOCATION "<< shlEmptyName << currentPoint << std::endl;
+    
     //------------------------------------------------------
     // Straight horizontal line (SHL) (conductor)
     G4String shlConductorName = pName + "_shlConductor";
