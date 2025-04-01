@@ -382,6 +382,7 @@ void FourQubitDetectorConstruction::SetupGeometry() {
 
 
       // Resonator
+      //G4ThreeVector locatetopResonator0(-0.39 * mm, 0.3 * mm, 0);
       G4ThreeVector locatetopResonator0(-0.39 * mm, 0.39 * mm, 0);
 
       FourQubitResonator *topResonator0 = new FourQubitResonator(0,
