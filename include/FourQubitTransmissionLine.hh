@@ -38,13 +38,14 @@
 #include "FourQubitPad.hh"
 #include "globals.hh"
 
+#include "FourQubitComponentModel.hh"
+
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4PVPlacement;
 
 /// Detector construction class to define materials and geometry.
-class FourQubitTransmissionLine
-{
+class FourQubitTransmissionLine : public FourQubitComponentModel{  
   public:
     FourQubitTransmissionLine();
     ~FourQubitTransmissionLine();
@@ -85,8 +86,6 @@ class FourQubitTransmissionLine
     G4LogicalVolume * fLog_output;
     G4VPhysicalVolume * fPhys_output;
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList; //List of all fundamental sub-volumes in the transmission line. String 1 is "material_description", String 2 should be unique identifier (name of the sub-physical volume)
-  
-  
   
 };
 

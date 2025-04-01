@@ -36,6 +36,8 @@
 #include "FourQubitDetectorParameters.hh"
 #include "globals.hh"
 
+#include "FourQubitComponentModel.hh"
+
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4PVPlacement;

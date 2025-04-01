@@ -104,7 +104,8 @@ namespace FourQubitDetectorParameters
   constexpr double dp_resonatorAssemblyBaseNbDimY = 1925.311 * CLHEP::um;
   constexpr double dp_resonatorAssemblyBaseNbDimZ = dp_groundPlaneDimZ;
   constexpr double dp_resonatorAssemblyBaseNbEdgeBottomDimY = 5.0 * CLHEP::um; //Separation between the transmission line empty edge and the nearby resonator empty edge
-  
+  //constexpr double dp_resonatorAssemblyBaseNbEdgeBottomDimY = 7.0 * CLHEP::um; //Separation between the transmission line empty edge and the nearby resonator empty edge
+
   constexpr double dp_tlCouplingEmptyDimX = 447.518 * CLHEP::um;
   constexpr double dp_tlCouplingEmptyDimY = 22 * CLHEP::um;
   constexpr double dp_tlCouplingEmptyDimZ = dp_groundPlaneDimZ;
@@ -433,7 +434,7 @@ namespace FourQubitDetectorParameters
   constexpr double dp_resonatorBaseNbEdgeBottomDimY = 5.0 * CLHEP::um;
 
   constexpr double dp_resonatorBaseNbLayerDimX = 670 *CLHEP::um; //520
-  constexpr double dp_resonatorBaseNbLayerDimY = 670 *CLHEP::um;
+  constexpr double dp_resonatorBaseNbLayerDimY = 720 *CLHEP::um; //670
   constexpr double dp_resonatorBaseNbLayerDimZ = dp_groundPlaneDimZ;
 
   constexpr double dp_shlEmptyDimX = 390 *CLHEP::um;
