@@ -1,9 +1,8 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
+//
+/// \file src/FourQubitSensitivity.cc
+/// \brief Definition of FourQubitSensitivity class
+///  
 
-#include "FourQubitSensitivity.hh"
 #include "G4CMPElectrodeHit.hh"
 #include "G4Event.hh"
 #include "G4HCofThisEvent.hh"
@@ -14,7 +13,10 @@
 #include "G4RunManager.hh"
 #include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"
+
+#include "FourQubitSensitivity.hh"
 #include "FourQubitConfigManager.hh"
+
 #include <fstream>
 #include <iostream>
 

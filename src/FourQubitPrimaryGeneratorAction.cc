@@ -1,27 +1,19 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
-
-/// \file exoticphysics/phonon/src/FourQubitPrimaryGeneratorAction.cc
-/// \brief Implementation of the FourQubitPrimaryGeneratorAction class
 //
-// $Id: e75f788b103aef810361fad30f75077829192c13 $
-//
-// 20140519  Allow the user to specify phonon type by name in macro; if
-//	     "geantino" is set, use random generator to select.
-
-#include "FourQubitPrimaryGeneratorAction.hh"
+/// \file src/FourQubitPrimaryGeneratorAction.cc
+/// \brief Definition of FourQubitPrimaryGeneratorAction class
+///  
 
 #include "G4Event.hh"
 #include "G4Geantino.hh"
-#include "G4ParticleGun.hh"
 #include "G4GeneralParticleSource.hh"
-#include "G4RandomDirection.hh"
+#include "G4ParticleGun.hh"
+#include "G4PhononLong.hh"
 #include "G4PhononTransFast.hh"
 #include "G4PhononTransSlow.hh"
-#include "G4PhononLong.hh"
+#include "G4RandomDirection.hh"
 #include "G4SystemOfUnits.hh"
+
+#include "FourQubitPrimaryGeneratorAction.hh"
 
 using namespace std;
 

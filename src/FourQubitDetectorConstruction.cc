@@ -3,27 +3,6 @@
 /// \brief Implementation of the DetectorConstruction class
 //
 
-#include "FourQubitCornerFluxLine.hh"
-#include "FourQubitCurve.hh"
-#include "FourQubitCurveFluxLine.hh"
-#include "FourQubitDetectorConstruction.hh"
-#include "FourQubitPad.hh"
-#include "FourQubitQubitHousing.hh"
-#include "FourQubitResonator.hh"
-#include "FourQubitResonatorAssembly.hh"
-#include "FourQubitSensitivity.hh"
-#include "FourQubitStraight.hh"
-#include "FourQubitStraightFluxLine.hh"
-#include "FourQubitTransmissionLine.hh"
-#include "FourQubitTransmon.hh"
-#include "FourQubitXmon.hh"
-
-#include "G4CMPElectrodeSensitivity.hh"
-#include "G4CMPLogicalBorderSurface.hh"
-#include "G4CMPLogicalBorderSurface.hh"
-#include "G4CMPPhononElectrode.hh"
-#include "G4CMPSurfaceProperty.hh"
-
 #include "G4Box.hh"
 #include "G4Colour.hh"
 #include "G4FieldManager.hh"
@@ -47,6 +26,27 @@
 #include "G4UniformMagField.hh"
 #include "G4UserLimits.hh"
 #include "G4VisAttributes.hh"
+
+#include "G4CMPElectrodeSensitivity.hh"
+#include "G4CMPLogicalBorderSurface.hh"
+#include "G4CMPLogicalBorderSurface.hh"
+#include "G4CMPPhononElectrode.hh"
+#include "G4CMPSurfaceProperty.hh"
+
+#include "FourQubitDetectorConstruction.hh"
+#include "FourQubitCornerFluxLine.hh"
+#include "FourQubitCurve.hh"
+#include "FourQubitCurveFluxLine.hh"
+#include "FourQubitPad.hh"
+#include "FourQubitQubitHousing.hh"
+#include "FourQubitResonator.hh"
+#include "FourQubitResonatorAssembly.hh"
+#include "FourQubitSensitivity.hh"
+#include "FourQubitStraight.hh"
+#include "FourQubitStraightFluxLine.hh"
+#include "FourQubitTransmissionLine.hh"
+#include "FourQubitTransmon.hh"
+#include "FourQubitXmon.hh"
 
 using namespace FourQubitDetectorParameters;
 

@@ -1,8 +1,4 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
-
+//
 /// \file src/FourQubitCornerFluxLine.cc
 /// \brief Definition of FourQubitCornerFluxLine class
 ///   Implement flux lines 
