@@ -1,10 +1,10 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
+//
+/// \file FourQubitSensitivity.hh
+/// \brief Definition of the class 
+///     
 
-#ifndef FourQubitSensitivity_h
-#define FourQubitSensitivity_h 1
+#ifndef FourQubitSensitivity_hh
+#define FourQubitSensitivity_hh 1
 
 #include "G4CMPElectrodeSensitivity.hh"
 

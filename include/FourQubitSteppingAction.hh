@@ -1,7 +1,8 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
+
+//
+/// \file FourQubitSteppingAction.hh
+/// \brief Definition of the class 
+///    
 
 #ifndef FourQubitSteppingAction_hh
 #define FourQubitSteppingAction_hh 1
@@ -25,9 +26,6 @@ private:
 
   //Step info output file
   std::ofstream fOutputFile;
-  
-  
-  
   
 };
 

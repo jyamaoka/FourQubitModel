@@ -3,14 +3,14 @@
 /// \brief Definition of the class defining Resonator
 ///
 
-#ifndef FourQubitResonator_h
-#define FourQubitResonator_h 1
+#ifndef FourQubitResonator_hh
+#define FourQubitResonator_hh 1
 
 #include "G4UnionSolid.hh"
-#include "FourQubitDetectorParameters.hh"
 #include "globals.hh"
 
 #include "FourQubitComponentModel.hh"
+#include "FourQubitDetectorParameters.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -62,7 +62,5 @@ private:
 
   std::vector<std::tuple<std::string, G4String, G4VPhysicalVolume *>> fFundamentalVolumeList;
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

@@ -1,16 +1,10 @@
-////////////////////////////////////////////////////////
 //
-// FourQubitDetectorParameters.hh
-//
-// linehan3@fnal.gov
-// This is a file of detector parameters, those
-// that define dimensions of the various geometries
-// used in the silicon qubit sims code.
-//
-////////////////////////////////////////////////////////
+/// \file FourQubitDetectorParameters.hh
+/// \brief Definition of parameters 
+///
 
-#ifndef FourQubitDetectorParameters_h
-#define FourQubitDetectorParameters_h 1
+#ifndef FourQubitDetectorParameters_hh
+#define FourQubitDetectorParameters_hh 1
 
 #include "CLHEP/Units/SystemOfUnits.h"
 #include <cstdlib>
@@ -450,11 +444,5 @@ namespace FourQubitDetectorParameters
   constexpr double dp_resonatorCurveCentralRadius = dp_resonatorCurveSmallestRadius + dp_tlCouplingEmptyDimY / 2.0;
 
 }
-
-
-
-
-
-
 
 #endif

@@ -1,18 +1,18 @@
 //
-/// \file FourQubitPad.hh
-/// \brief Definition of the class defining how a transmission line is constructed on a qubit chip
+/// \file FourQubitResonatorAssembly.hh
+/// \brief Definition of the class defining resonator assembly
 ///        
 
-#ifndef FourQubitResonatorAssembly_h
-#define FourQubitResonatorAssembly_h 1
+#ifndef FourQubitResonatorAssembly_hh
+#define FourQubitResonatorAssembly_hh 1
 
 
 #include "G4PVPlacement.hh"
-#include "FourQubitDetectorParameters.hh"
-#include "FourQubitPad.hh"
 #include "globals.hh"
 
 #include "FourQubitComponentModel.hh"
+#include "FourQubitDetectorParameters.hh"
+#include "FourQubitPad.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -54,8 +54,6 @@ class FourQubitResonatorAssembly : public FourQubitComponentModel
   void MakeShuntCapacitorCross(G4String pName, G4LogicalVolume * log_baseNbLayer);
 
   std::vector< std::tuple<std::string,G4String,G4VPhysicalVolume*> > GetListOfAllFundamentalSubVolumes();
-  
-  protected:
 
   private:
 

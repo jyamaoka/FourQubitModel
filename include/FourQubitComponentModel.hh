@@ -3,8 +3,8 @@
 /// \brief Definition of the class defining Curve
 ///        
 
-#ifndef FourQubitComponentModel_h
-#define FourQubitComponentModel_h 1
+#ifndef FourQubitComponentModel_hh
+#define FourQubitComponentModel_hh 1
 
 #include "G4UnionSolid.hh"
 #include "globals.hh"

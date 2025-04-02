@@ -1,10 +1,10 @@
 //
-//
-/// \file exoticphysics/phonon/include/PhononDetectorConstruction.hh
-/// \brief Definition of the FourQubitDetectorConstruction class
+/// \file FourQubitDetectorConstruction.hh
+/// \brief Definition of the class 
+///
 
-#ifndef FourQubitDetectorConstruction_h
-#define FourQubitDetectorConstruction_h 1
+#ifndef FourQubitDetectorConstruction_hh
+#define FourQubitDetectorConstruction_hh 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "globals.hh"

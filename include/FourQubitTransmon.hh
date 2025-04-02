@@ -3,14 +3,14 @@
 /// \brief Definition of the class defining Transmon
 ///        
 
-#ifndef FourQubitTransmon_h
-#define FourQubitTransmon_h 1
+#ifndef FourQubitTransmon_hh
+#define FourQubitTransmon_hh 1
 
 #include "G4UnionSolid.hh"
-#include "FourQubitDetectorParameters.hh"
 #include "globals.hh"
 
 #include "FourQubitComponentModel.hh"
+#include "FourQubitDetectorParameters.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -46,8 +46,6 @@ class FourQubitTransmon : public FourQubitComponentModel
 				   G4bool pSurfChk=false);
 
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > GetListOfAllFundamentalSubVolumes();  
-  
-  protected:
 
   private:
 
@@ -57,7 +55,5 @@ class FourQubitTransmon : public FourQubitComponentModel
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList;
   
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

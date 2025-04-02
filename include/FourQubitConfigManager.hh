@@ -1,25 +1,14 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
+//
+/// \file FourQubitConfigManager.hh
+/// \brief Definition of the class 
+/// 
 
 #ifndef FourQubitConfigManager_hh
 #define FourQubitConfigManager_hh 1
 
-// $Id$
-// File:  FourQubitConfigManager.hh
-//
-// Description:	Singleton container class for user configuration of G4CMP
-//		phonon example. Looks for environment variables	at
-//		initialization to set default values; active values may be
-//		changed via macro commands (see FourQubitConfigMessenger).
-//
-// 20170816  M. Kelsey -- Extract hit filename from G4CMPConfigManager.
-
 #include "globals.hh"
 
 class FourQubitConfigMessenger;
-
 
 class FourQubitConfigManager {
 public:

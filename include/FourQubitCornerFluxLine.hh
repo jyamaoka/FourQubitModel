@@ -1,14 +1,11 @@
 //
-//
-/// \file FourQubitPad.hh
-/// \brief Definition of the class defining how a transmission line is constructed on a qubit chip
+/// \file FourQubitCornerFluxLine.hh
+/// \brief Definition of the class
 ///        
 
-#ifndef FourQubitCornerFluxLine_h
-#define FourQubitCornerFluxLine_h 1
+#ifndef FourQubitCornerFluxLine_hh
+#define FourQubitCornerFluxLine_hh 1
 
-
-//#include "G4PVPlacement.hh"
 #include "G4UnionSolid.hh"
 #include "FourQubitDetectorParameters.hh"
 #include "FourQubitPad.hh"
@@ -65,7 +62,5 @@ class FourQubitCornerFluxLine : public FourQubitComponentModel
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList;
   
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
