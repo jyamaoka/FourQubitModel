@@ -3,14 +3,14 @@
 /// \brief Definition of the class defining Curve
 ///        
 
-#ifndef FourQubitCurve_h
-#define FourQubitCurve_h 1
+#ifndef FourQubitCurve_hh
+#define FourQubitCurve_hh 1
 
 #include "G4UnionSolid.hh"
-#include "FourQubitDetectorParameters.hh"
 #include "globals.hh"
 
 #include "FourQubitComponentModel.hh"
+#include "FourQubitDetectorParameters.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -63,7 +63,5 @@ class FourQubitCurve : public FourQubitComponentModel
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList;
   
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

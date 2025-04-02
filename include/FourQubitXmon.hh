@@ -46,8 +46,6 @@ class FourQubitXmon : public FourQubitComponentModel
 				   G4bool pSurfChk=false);
 
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > GetListOfAllFundamentalSubVolumes();  
-  
-  protected:
 
   private:
 
@@ -57,7 +55,5 @@ class FourQubitXmon : public FourQubitComponentModel
     std::vector<std::tuple<std::string,G4String,G4VPhysicalVolume*> > fFundamentalVolumeList;
   
 };
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
