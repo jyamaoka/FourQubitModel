@@ -1,22 +1,19 @@
-/***********************************************************************\
- * This software is licensed under the terms of the GNU General Public *
- * License version 3 or later. See G4CMP/LICENSE for the full license. *
-\***********************************************************************/
+//
+/// \file src/FourQubitSteppingAction.cc
+/// \brief Definition of FourQubitSteppingAction class
+///  
 
-
-// Basic User Stepping action for the silicon six qubit array (mostly for debugging)
+#include "G4Run.hh"
+#include "G4RunManager.hh"
+#include "G4Step.hh"
+#include "G4StepPoint.hh"
+#include "G4Threading.hh"
+#include "G4Track.hh"
+#include "globals.hh"
 
 #include "FourQubitSteppingAction.hh"
+
 #include <iostream>
-#include "globals.hh"
-#include "G4Run.hh"
-#include "G4Track.hh"
-#include "G4Step.hh"
-#include "G4Threading.hh"
-
-#include "G4RunManager.hh"
-#include "G4StepPoint.hh"
-
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 //Default constructor
