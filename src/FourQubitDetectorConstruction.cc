@@ -394,14 +394,12 @@ void FourQubitDetectorConstruction::SetupGeometry() {
                                                                  checkOverlaps,
                                                                  7,
                                                                  546 * um);
-      //G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
-      //G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
+      G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
+      G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
       G4ThreeVector anchorq0 =  topResonator0->GetResEndVector() + locatetopResonator0;
 
-      //std::cout<<
-
       // Do the logical border creation now
-      //LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+      LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
 
       G4ThreeVector locatetopResonator1(1.17 * mm, 0.39 * mm, 0);
 
