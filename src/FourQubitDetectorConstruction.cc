@@ -51,72 +51,94 @@
 using namespace FourQubitDetectorParameters;
 
 FourQubitDetectorConstruction::FourQubitDetectorConstruction()
-    : fLiquidHelium(0), fGermanium(0), fAluminum(0), fTungsten(0),
+    : fLiquidHelium(0),
+      fGermanium(0),
+      fAluminum(0),
+      fTungsten(0),
       fWorldPhys(0),
-      fSuperconductorSensitivity(0), fConstructed(false) { ; }
+      fSuperconductorSensitivity(0),
+      fConstructed(false) {
+  ;
+}
 
 FourQubitDetectorConstruction::~FourQubitDetectorConstruction() { ; }
 
-G4VPhysicalVolume *FourQubitDetectorConstruction::Construct(){
-   if (fConstructed)
-   {
-      if (!G4RunManager::IfGeometryHasBeenDestroyed())
-      {
-         // Run manager hasn't cleaned volume stores. This code shouldn't execute
-         G4GeometryManager::GetInstance()->OpenGeometry();
-         G4PhysicalVolumeStore::GetInstance()->Clean();
-         G4LogicalVolumeStore::GetInstance()->Clean();
-         G4SolidStore::GetInstance()->Clean();
-      }
-      // Have to completely remove all lattices to avoid warning on reconstruction
-      G4LatticeManager::GetLatticeManager()->Reset();
-      // Clear all LogicalSurfaces
-      // NOTE: No need to redefine the G4CMPSurfaceProperties
-      G4CMPLogicalBorderSurface::CleanSurfaceTable();
-   }
+G4VPhysicalVolume *FourQubitDetectorConstruction::Construct() {
+  if (fConstructed) {
+    if (!G4RunManager::IfGeometryHasBeenDestroyed()) {
+      // Run manager hasn't cleaned volume stores. This code shouldn't execute
+      G4GeometryManager::GetInstance()->OpenGeometry();
+      G4PhysicalVolumeStore::GetInstance()->Clean();
+      G4LogicalVolumeStore::GetInstance()->Clean();
+      G4SolidStore::GetInstance()->Clean();
+    }
+    // Have to completely remove all lattices to avoid warning on reconstruction
+    G4LatticeManager::GetLatticeManager()->Reset();
+    // Clear all LogicalSurfaces
+    // NOTE: No need to redefine the G4CMPSurfaceProperties
+    G4CMPLogicalBorderSurface::CleanSurfaceTable();
+  }
 
-   DefineMaterials();
-   SetupGeometry();
-   fConstructed = true;
+  DefineMaterials();
+  SetupGeometry();
+  fConstructed = true;
 
-   return fWorldPhys;
+  return fWorldPhys;
 }
 
-void FourQubitDetectorConstruction::LogicalBorderCreation(FourQubitComponentModel* componentModel,
-                                                          G4VPhysicalVolume* physicalSiVolume, 
-                                                          G4CMPSurfaceProperty* siNbInterface,
-                                                          G4CMPSurfaceProperty* siVacuumInterface) {
-   // Do the logical border creation now
-   for (int iSubVol = 0; iSubVol < componentModel->GetListOfAllFundamentalSubVolumes().size(); ++iSubVol) {
-      std::cout << "Sub volume names (to be used for boundaries): " 
-                << std::get<1>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
-                << " with material " 
-                << std::get<0>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]) 
-                << std::endl;
+void FourQubitDetectorConstruction::LogicalBorderCreation(
+    FourQubitComponentModel *componentModel,
+    G4VPhysicalVolume *physicalSiVolume, G4CMPSurfaceProperty *siNbInterface,
+    G4CMPSurfaceProperty *siVacuumInterface) {
+  // Do the logical border creation now
+  for (int iSubVol = 0;
+       iSubVol < componentModel->GetListOfAllFundamentalSubVolumes().size();
+       ++iSubVol) {
+    std::cout
+        << "Sub volume names (to be used for boundaries): "
+        << std::get<1>(
+               componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
+        << " with material "
+        << std::get<0>(
+               componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
+        << std::endl;
 
-      std::string tempName = "border_siliconChip_" + std::get<1>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]);
-      if (std::get<0>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Vacuum") != std::string::npos) {
-         G4CMPLogicalBorderSurface *border_siliconChip_Empty = new G4CMPLogicalBorderSurface(tempName, physicalSiVolume,
-                                                                                             std::get<2>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), 
-                                                                                             siVacuumInterface);
-      }
-      if (std::get<0>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]).find("Niobium") != std::string::npos) {
-         G4CMPLogicalBorderSurface *border_siliconChip_Conductor = new G4CMPLogicalBorderSurface(tempName, physicalSiVolume,
-                                                                                                 std::get<2>(componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]), 
-                                                                                                 siNbInterface);
-      }
-   }
+    std::string tempName =
+        "border_siliconChip_" +
+        std::get<1>(
+            componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]);
+    if (std::get<0>(
+            componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
+            .find("Vacuum") != std::string::npos) {
+      G4CMPLogicalBorderSurface *border_siliconChip_Empty =
+          new G4CMPLogicalBorderSurface(
+              tempName, physicalSiVolume,
+              std::get<2>(
+                  componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]),
+              siVacuumInterface);
+    }
+    if (std::get<0>(
+            componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol])
+            .find("Niobium") != std::string::npos) {
+      G4CMPLogicalBorderSurface *border_siliconChip_Conductor =
+          new G4CMPLogicalBorderSurface(
+              tempName, physicalSiVolume,
+              std::get<2>(
+                  componentModel->GetListOfAllFundamentalSubVolumes()[iSubVol]),
+              siNbInterface);
+    }
+  }
 }
 
 void FourQubitDetectorConstruction::DefineMaterials() {
-   G4NistManager *nistManager = G4NistManager::Instance();
+  G4NistManager *nistManager = G4NistManager::Instance();
 
-   fLiquidHelium = nistManager->FindOrBuildMaterial("G4_AIR"); // to be corrected
-   fGermanium = nistManager->FindOrBuildMaterial("G4_Ge");
-   fSilicon = nistManager->FindOrBuildMaterial("G4_Si");
-   fAluminum = nistManager->FindOrBuildMaterial("G4_Al");
-   fTungsten = nistManager->FindOrBuildMaterial("G4_W");
-   fNiobium = nistManager->FindOrBuildMaterial("G4_Nb");
+  fLiquidHelium = nistManager->FindOrBuildMaterial("G4_AIR");  // to fix
+  fGermanium = nistManager->FindOrBuildMaterial("G4_Ge");
+  fSilicon = nistManager->FindOrBuildMaterial("G4_Si");
+  fAluminum = nistManager->FindOrBuildMaterial("G4_Al");
+  fTungsten = nistManager->FindOrBuildMaterial("G4_W");
+  fNiobium = nistManager->FindOrBuildMaterial("G4_Nb");
 }
 
 void FourQubitDetectorConstruction::SetupGeometry() {
@@ -125,49 +147,50 @@ void FourQubitDetectorConstruction::SetupGeometry() {
 
    // the following coefficients and cutoff values are not well-motivated
    // the code below is used only to demonstrate how to set these values.
-   const std::vector<G4double> anhCoeffs = {0, 0, 0, 0, 0, 0};  // Turn this off temporarily
-   const std::vector<G4double> diffCoeffs = {1, 0, 0, 0, 0, 0}; // Explicitly make this 1 for now
-   const std::vector<G4double> specCoeffs = {0, 0, 0, 0, 0, 0}; // Turn this off temporarily
-   const G4double anhCutoff = 520., reflCutoff = 350.;          // Units external
+   const std::vector<G4double> anhCoeffs = {0, 0, 0, 0, 0, 0};   // Turn off
+                                                                 // temporarily
+   const std::vector<G4double> diffCoeffs = {1, 0, 0, 0, 0, 0};  // Explicitly
+                                                                 // make this 1
+                                                                 // for now
+   const std::vector<G4double> specCoeffs = {0, 0, 0, 0, 0, 0};  // Turn off
+                                                                 // temporarily
+   const G4double anhCutoff = 520., reflCutoff = 350.;  // Units external
 
-   // These are just the definitions of the interface TYPES, not the interfaces 
+   // These are just the definitions of the interface TYPES, not the interfaces
    // themselves. These must be called in a set of loops
    // below, and invoke these surface definitions.
    if (!fConstructed) {
-      fSiNbInterface = new G4CMPSurfaceProperty("SiNbInterface",
-                                                1.0, 0.0, 0.0, 0.0,
-                                                0.1, 1.0, 0.0, 0.0);
-      fSiCopperInterface = new G4CMPSurfaceProperty("SiCopperInterface",
-                                                    1.0, 0.0, 0.0, 0.0,
-                                                    1.0, 0.0, 0.0, 0.0);
-      fSiVacuumInterface = new G4CMPSurfaceProperty("SiVacuumInterface",
-                                                    0.0, 1.0, 0.0, 0.0,
-                                                    0.0, 1.0, 0.0, 0.0);
+     fSiNbInterface = new G4CMPSurfaceProperty("SiNbInterface", 1.0, 0.0, 0.0,
+                                               0.0, 0.1, 1.0, 0.0, 0.0);
+     fSiCopperInterface = new G4CMPSurfaceProperty(
+         "SiCopperInterface", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+     fSiVacuumInterface = new G4CMPSurfaceProperty(
+         "SiVacuumInterface", 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
-      fSiNbInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
-                                              diffCoeffs, specCoeffs, GHz, GHz, GHz);
-      fSiCopperInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
-                                                  diffCoeffs, specCoeffs, GHz, GHz, GHz);
-      fSiVacuumInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
-                                                  diffCoeffs, specCoeffs, GHz, GHz, GHz);
+     fSiNbInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
+                                             diffCoeffs, specCoeffs, GHz, GHz,
+                                             GHz);
+     fSiCopperInterface->AddScatteringProperties(anhCutoff, reflCutoff,
+                                                 anhCoeffs, diffCoeffs,
+                                                 specCoeffs, GHz, GHz, GHz);
+     fSiVacuumInterface->AddScatteringProperties(anhCutoff, reflCutoff,
+                                                 anhCoeffs, diffCoeffs,
+                                                 specCoeffs, GHz, GHz, GHz);
 
-      // Add a phonon sensor to the interface properties here.
-      AttachPhononSensor(fSiNbInterface);
+     // Add a phonon sensor to the interface properties here.
+     AttachPhononSensor(fSiNbInterface);
    }
 
    // Now we start constructing the various components and their interfaces
    // World
-   G4VSolid *solid_world = new G4Box("World", 55. * cm, 55. * cm, 55. * cm);
-   G4LogicalVolume *log_world = new G4LogicalVolume(solid_world, fLiquidHelium, "World");
-   // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0, 0));
+   G4VSolid *solid_world = new G4Box ("World", 55. * cm, 55. * cm, 55. * cm);
+   G4LogicalVolume *log_world = new G4LogicalVolume(solid_world, fLiquidHelium,
+                                                    "World");
+   // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0,
+   // 0));
    log_world->SetVisAttributes(G4VisAttributes::Invisible);
-   fWorldPhys = new G4PVPlacement(0,
-                                  G4ThreeVector(),
-                                  log_world,
-                                  "World",
-                                  0,
-                                  false,
-                                  0);
+   fWorldPhys =
+       new G4PVPlacement(0, G4ThreeVector(), log_world, "World", 0, false, 0);
 
    bool checkOverlaps = true;
 
@@ -179,20 +202,16 @@ void FourQubitDetectorConstruction::SetupGeometry() {
                                         0.5 * dp_siliconChipDimZ);
 
    // Now attribute a physical material to the chip
-   G4LogicalVolume *log_siliconChip = new G4LogicalVolume(solid_siliconChip,
-                                                          fSilicon,
-                                                          "SiliconChip_log");
+   G4LogicalVolume *log_siliconChip
+       = new G4LogicalVolume (solid_siliconChip, fSilicon, "SiliconChip_log");
 
-   // Now, create a physical volume and G4PVPlacement for storing as the final output
-   G4ThreeVector siliconChipTranslate(0, 0, 0.5 * (dp_housingDimZ - dp_siliconChipDimZ) + dp_eps);
-   G4VPhysicalVolume *phys_siliconChip = new G4PVPlacement(0,
-                                                           siliconChipTranslate,
-                                                           log_siliconChip,
-                                                           "SiliconChip",
-                                                           log_world,
-                                                           false,
-                                                           0,
-                                                           checkOverlaps);
+   // Now, create a physical volume and G4PVPlacement for storing as the final
+   // output
+   G4ThreeVector siliconChipTranslate(
+       0, 0, 0.5 * (dp_housingDimZ - dp_siliconChipDimZ) + dp_eps);
+   G4VPhysicalVolume *phys_siliconChip =
+       new G4PVPlacement(0, siliconChipTranslate, log_siliconChip,
+                         "SiliconChip", log_world, false, 0, checkOverlaps);
 
    G4VisAttributes *siliconChipVisAtt = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
    siliconChipVisAtt->SetVisibility(true);
