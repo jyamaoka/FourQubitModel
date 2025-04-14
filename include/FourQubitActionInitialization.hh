@@ -1,7 +1,7 @@
 //
 /// \file FourQubitActionInitialization.hh
-/// \brief Definition of the class 
-///   
+/// \brief Definition of the class
+///
 
 #ifndef FourQubitActionInitialization_hh
 #define FourQubitActionInitialization_hh 1
@@ -10,9 +10,9 @@
 
 class FourQubitActionInitialization : public G4VUserActionInitialization {
 public:
-  FourQubitActionInitialization() {;}
-  virtual ~FourQubitActionInitialization() {;}
+  FourQubitActionInitialization() { ; }
+  virtual ~FourQubitActionInitialization() { ; }
   virtual void Build() const;
 };
 
-#endif	/* FourQubitActionInitialization_hh */
+#endif /* FourQubitActionInitialization_hh */

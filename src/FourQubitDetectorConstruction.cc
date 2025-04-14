@@ -183,37 +183,39 @@ void FourQubitDetectorConstruction::SetupGeometry() {
 
    // Now we start constructing the various components and their interfaces
    // World
-   G4VSolid *solid_world = new G4Box ("World", 55. * cm, 55. * cm, 55. * cm);
+   G4VSolid *solid_world = new G4Box("World", 55. * cm, 55. * cm, 55. * cm);
    G4LogicalVolume *log_world = new G4LogicalVolume(solid_world, fLiquidHelium,
                                                     "World");
    // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0,
    // 0));
    log_world->SetVisAttributes(G4VisAttributes::Invisible);
-   fWorldPhys =
-       new G4PVPlacement(0, G4ThreeVector(), log_world, "World", 0, false, 0);
+   fWorldPhys = new G4PVPlacement(0, G4ThreeVector(), log_world, "World", 0,
+                                  false, 0);
 
    bool checkOverlaps = true;
 
-   // First, set up the qubit chip substrate. By default, assume that we're using 
-   // this. Otherwise, it's hard to establish a sensitivity object for this.
-   G4Box *solid_siliconChip = new G4Box("QubitChip_solid",
-                                        0.5 * dp_siliconChipDimX,
-                                        0.5 * dp_siliconChipDimY,
-                                        0.5 * dp_siliconChipDimZ);
+   // First, set up the qubit chip substrate. By default, assume that we're
+   // using this. Otherwise, it's hard to establish a sensitivity object for
+   // this.
+   G4Box *solid_siliconChip =
+       new G4Box("QubitChip_solid", 0.5 * dp_siliconChipDimX,
+                 0.5 * dp_siliconChipDimY, 0.5 * dp_siliconChipDimZ);
 
    // Now attribute a physical material to the chip
-   G4LogicalVolume *log_siliconChip
-       = new G4LogicalVolume (solid_siliconChip, fSilicon, "SiliconChip_log");
+   G4LogicalVolume *log_siliconChip =
+       new G4LogicalVolume(solid_siliconChip, fSilicon, "SiliconChip_log");
 
    // Now, create a physical volume and G4PVPlacement for storing as the final
    // output
    G4ThreeVector siliconChipTranslate(
        0, 0, 0.5 * (dp_housingDimZ - dp_siliconChipDimZ) + dp_eps);
+
    G4VPhysicalVolume *phys_siliconChip =
        new G4PVPlacement(0, siliconChipTranslate, log_siliconChip,
                          "SiliconChip", log_world, false, 0, checkOverlaps);
 
-   G4VisAttributes *siliconChipVisAtt = new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
+   G4VisAttributes *siliconChipVisAtt =
+       new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
    siliconChipVisAtt->SetVisibility(true);
    log_siliconChip->SetVisAttributes(siliconChipVisAtt);
 
