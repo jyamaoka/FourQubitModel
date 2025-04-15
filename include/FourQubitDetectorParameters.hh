@@ -7,8 +7,9 @@
 #define FourQubitDetectorParameters_hh 1
 
 #include "CLHEP/Units/SystemOfUnits.h"
-#include <cstdlib>
+
 #include <cmath>
+#include <cstdlib>
 
 namespace FourQubitDetectorParameters
 {

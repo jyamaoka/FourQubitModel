@@ -3,6 +3,13 @@
 /// \brief Implementation of the DetectorConstruction class
 //
 
+#include "FourQubitDetectorConstruction.hh"
+
+#include "G4CMPElectrodeSensitivity.hh"
+#include "G4CMPLogicalBorderSurface.hh"
+#include "G4CMPPhononElectrode.hh"
+#include "G4CMPSurfaceProperty.hh"
+
 #include "G4Box.hh"
 #include "G4Colour.hh"
 #include "G4FieldManager.hh"
@@ -14,8 +21,8 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
-#include "G4PhysicalVolumeStore.hh"
 #include "G4PVPlacement.hh"
+#include "G4PhysicalVolumeStore.hh"
 #include "G4RunManager.hh"
 #include "G4SDManager.hh"
 #include "G4SolidStore.hh"
@@ -27,13 +34,6 @@
 #include "G4UserLimits.hh"
 #include "G4VisAttributes.hh"
 
-#include "G4CMPElectrodeSensitivity.hh"
-#include "G4CMPLogicalBorderSurface.hh"
-#include "G4CMPLogicalBorderSurface.hh"
-#include "G4CMPPhononElectrode.hh"
-#include "G4CMPSurfaceProperty.hh"
-
-#include "FourQubitDetectorConstruction.hh"
 #include "FourQubitCornerFluxLine.hh"
 #include "FourQubitCurve.hh"
 #include "FourQubitCurveFluxLine.hh"
@@ -142,628 +142,591 @@ void FourQubitDetectorConstruction::DefineMaterials() {
 }
 
 void FourQubitDetectorConstruction::SetupGeometry() {
-   // First, define border surface properties that can be referenced later
-   const G4double GHz = 1e9 * hertz;
+  // First, define border surface properties that can be referenced later
+  const G4double GHz = 1e9 * hertz;
 
-   // the following coefficients and cutoff values are not well-motivated
-   // the code below is used only to demonstrate how to set these values.
-   const std::vector<G4double> anhCoeffs = {0, 0, 0, 0, 0, 0};   // Turn off
-                                                                 // temporarily
-   const std::vector<G4double> diffCoeffs = {1, 0, 0, 0, 0, 0};  // Explicitly
-                                                                 // make this 1
-                                                                 // for now
-   const std::vector<G4double> specCoeffs = {0, 0, 0, 0, 0, 0};  // Turn off
-                                                                 // temporarily
-   const G4double anhCutoff = 520., reflCutoff = 350.;  // Units external
+  // the following coefficients and cutoff values are not well-motivated
+  // the code below is used only to demonstrate how to set these values.
+  const std::vector<G4double> anhCoeffs = {0, 0, 0, 0, 0, 0};   // Turn off
+                                                                // temporarily
+  const std::vector<G4double> diffCoeffs = {1, 0, 0, 0, 0, 0};  // Explicitly
+                                                                // make this 1
+                                                                // for now
+  const std::vector<G4double> specCoeffs = {0, 0, 0, 0, 0, 0};  // Turn off
+                                                                // temporarily
+  const G4double anhCutoff = 520., reflCutoff = 350.;  // Units external
 
-   // These are just the definitions of the interface TYPES, not the interfaces
-   // themselves. These must be called in a set of loops
-   // below, and invoke these surface definitions.
-   if (!fConstructed) {
-     fSiNbInterface = new G4CMPSurfaceProperty("SiNbInterface", 1.0, 0.0, 0.0,
-                                               0.0, 0.1, 1.0, 0.0, 0.0);
-     fSiCopperInterface = new G4CMPSurfaceProperty(
-         "SiCopperInterface", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
-     fSiVacuumInterface = new G4CMPSurfaceProperty(
-         "SiVacuumInterface", 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+  // These are just the definitions of the interface TYPES, not the interfaces
+  // themselves. These must be called in a set of loops
+  // below, and invoke these surface definitions.
+  if (!fConstructed) {
+    fSiNbInterface = new G4CMPSurfaceProperty("SiNbInterface", 1.0, 0.0, 0.0,
+                                              0.0, 0.1, 1.0, 0.0, 0.0);
+    fSiCopperInterface = new G4CMPSurfaceProperty("SiCopperInterface", 1.0, 0.0,
+                                                  0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+    fSiVacuumInterface = new G4CMPSurfaceProperty("SiVacuumInterface", 0.0, 1.0,
+                                                  0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
-     fSiNbInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
-                                             diffCoeffs, specCoeffs, GHz, GHz,
-                                             GHz);
-     fSiCopperInterface->AddScatteringProperties(anhCutoff, reflCutoff,
-                                                 anhCoeffs, diffCoeffs,
-                                                 specCoeffs, GHz, GHz, GHz);
-     fSiVacuumInterface->AddScatteringProperties(anhCutoff, reflCutoff,
-                                                 anhCoeffs, diffCoeffs,
-                                                 specCoeffs, GHz, GHz, GHz);
+    fSiNbInterface->AddScatteringProperties(anhCutoff, reflCutoff, anhCoeffs,
+                                            diffCoeffs, specCoeffs, GHz, GHz,
+                                            GHz);
+    fSiCopperInterface->AddScatteringProperties(anhCutoff, reflCutoff,
+                                                anhCoeffs, diffCoeffs,
+                                                specCoeffs, GHz, GHz, GHz);
+    fSiVacuumInterface->AddScatteringProperties(anhCutoff, reflCutoff,
+                                                anhCoeffs, diffCoeffs,
+                                                specCoeffs, GHz, GHz, GHz);
 
-     // Add a phonon sensor to the interface properties here.
-     AttachPhononSensor(fSiNbInterface);
-   }
+    // Add a phonon sensor to the interface properties here.
+    AttachPhononSensor(fSiNbInterface);
+  }
 
-   // Now we start constructing the various components and their interfaces
-   // World
-   G4VSolid *solid_world = new G4Box("World", 55. * cm, 55. * cm, 55. * cm);
-   G4LogicalVolume *log_world = new G4LogicalVolume(solid_world, fLiquidHelium,
-                                                    "World");
-   // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0,
-   // 0));
-   log_world->SetVisAttributes(G4VisAttributes::Invisible);
-   fWorldPhys = new G4PVPlacement(0, G4ThreeVector(), log_world, "World", 0,
-                                  false, 0);
+  // Now we start constructing the various components and their interfaces
+  // World
+  G4VSolid *solid_world = new G4Box("World", 55. * cm, 55. * cm, 55. * cm);
+  G4LogicalVolume *log_world =
+      new G4LogicalVolume(solid_world, fLiquidHelium, "World");
+  // worldLogical->SetUserLimits(new G4UserLimits(10*mm, DBL_MAX, DBL_MAX, 0,
+  // 0));
+  log_world->SetVisAttributes(G4VisAttributes::Invisible);
+  fWorldPhys =
+      new G4PVPlacement(0, G4ThreeVector(), log_world, "World", 0, false, 0);
 
-   bool checkOverlaps = true;
+  bool checkOverlaps = true;
 
-   // First, set up the qubit chip substrate. By default, assume that we're
-   // using this. Otherwise, it's hard to establish a sensitivity object for
-   // this.
-   G4Box *solid_siliconChip =
-       new G4Box("QubitChip_solid", 0.5 * dp_siliconChipDimX,
-                 0.5 * dp_siliconChipDimY, 0.5 * dp_siliconChipDimZ);
+  // First, set up the qubit chip substrate. By default, assume that we're
+  // using this. Otherwise, it's hard to establish a sensitivity object for
+  // this.
+  G4Box *solid_siliconChip =
+      new G4Box("QubitChip_solid", 0.5 * dp_siliconChipDimX,
+                0.5 * dp_siliconChipDimY, 0.5 * dp_siliconChipDimZ);
 
-   // Now attribute a physical material to the chip
-   G4LogicalVolume *log_siliconChip =
-       new G4LogicalVolume(solid_siliconChip, fSilicon, "SiliconChip_log");
+  // Now attribute a physical material to the chip
+  G4LogicalVolume *log_siliconChip =
+      new G4LogicalVolume(solid_siliconChip, fSilicon, "SiliconChip_log");
 
-   // Now, create a physical volume and G4PVPlacement for storing as the final
-   // output
-   G4ThreeVector siliconChipTranslate(
-       0, 0, 0.5 * (dp_housingDimZ - dp_siliconChipDimZ) + dp_eps);
+  // Now, create a physical volume and G4PVPlacement for storing as the final
+  // output
+  G4ThreeVector siliconChipTranslate(
+      0, 0, 0.5 * (dp_housingDimZ - dp_siliconChipDimZ) + dp_eps);
 
-   G4VPhysicalVolume *phys_siliconChip =
-       new G4PVPlacement(0, siliconChipTranslate, log_siliconChip,
-                         "SiliconChip", log_world, false, 0, checkOverlaps);
+  G4VPhysicalVolume *phys_siliconChip =
+      new G4PVPlacement(0, siliconChipTranslate, log_siliconChip, "SiliconChip",
+                        log_world, false, 0, checkOverlaps);
 
-   G4VisAttributes *siliconChipVisAtt =
-       new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
-   siliconChipVisAtt->SetVisibility(true);
-   log_siliconChip->SetVisAttributes(siliconChipVisAtt);
+  G4VisAttributes *siliconChipVisAtt =
+      new G4VisAttributes(G4Colour(0.5, 0.5, 0.5));
+  siliconChipVisAtt->SetVisibility(true);
+  log_siliconChip->SetVisAttributes(siliconChipVisAtt);
 
-   // Set up the G4CMP silicon lattice information using the G4LatticeManager
-   // G4LatticeManager gives physics processes access to lattices by volume
-   G4LatticeManager *LM = G4LatticeManager::GetLatticeManager();
-   G4LatticeLogical *log_siliconLattice = LM->LoadLattice(fSilicon, "Si");
+  // Set up the G4CMP silicon lattice information using the G4LatticeManager
+  // G4LatticeManager gives physics processes access to lattices by volume
+  G4LatticeManager *LM = G4LatticeManager::GetLatticeManager();
+  G4LatticeLogical *log_siliconLattice = LM->LoadLattice(fSilicon, "Si");
 
-   // G4LatticePhysical assigns G4LatticeLogical a physical orientation
-   G4LatticePhysical *phys_siliconLattice = new G4LatticePhysical(log_siliconLattice);
-   phys_siliconLattice->SetMillerOrientation(1, 0, 0);
-   LM->RegisterLattice(phys_siliconChip, phys_siliconLattice);
+  // G4LatticePhysical assigns G4LatticeLogical a physical orientation
+  G4LatticePhysical *phys_siliconLattice =
+      new G4LatticePhysical(log_siliconLattice);
+  phys_siliconLattice->SetMillerOrientation(1, 0, 0);
+  LM->RegisterLattice(phys_siliconChip, phys_siliconLattice);
 
-   // Set up border surfaces
-   G4CMPLogicalBorderSurface *border_siliconChip_world = 
-       new G4CMPLogicalBorderSurface("border_siliconChip_world", phys_siliconChip, 
-                                     fWorldPhys, fSiVacuumInterface);
+  // Set up border surfaces
+  G4CMPLogicalBorderSurface *border_siliconChip_world =
+      new G4CMPLogicalBorderSurface("border_siliconChip_world",
+                                    phys_siliconChip, fWorldPhys,
+                                    fSiVacuumInterface);
 
-   // If desired, set up the copper qubit housing
-   if (dp_useQubitHousing) {
-      FourQubitQubitHousing *qubitHousing = new FourQubitQubitHousing(0,
-                                                                      G4ThreeVector(0, 0, 0),
-                                                                      "QubitHousing",
-                                                                      log_world,
-                                                                      false,
-                                                                      0,
-                                                                      checkOverlaps);
-      G4LogicalVolume *log_qubitHousing = qubitHousing->GetLogicalVolume();
-      G4VPhysicalVolume *phys_qubitHousing = qubitHousing->GetPhysicalVolume();
+  // If desired, set up the copper qubit housing
+  if (dp_useQubitHousing) {
+    FourQubitQubitHousing *qubitHousing =
+        new FourQubitQubitHousing(0, G4ThreeVector(0, 0, 0), "QubitHousing",
+                                  log_world, false, 0, checkOverlaps);
+    G4LogicalVolume *log_qubitHousing = qubitHousing->GetLogicalVolume();
+    G4VPhysicalVolume *phys_qubitHousing = qubitHousing->GetPhysicalVolume();
 
-      // Set up the logical border surface
-      G4CMPLogicalBorderSurface *border_siliconChip_qubitHousing = 
-          new G4CMPLogicalBorderSurface("border_siliconChip_qubitHousing", 
-                                        phys_siliconChip, phys_qubitHousing, 
-                                        fSiCopperInterface);
-   }
+    // Set up the logical border surface
+    G4CMPLogicalBorderSurface *border_siliconChip_qubitHousing =
+        new G4CMPLogicalBorderSurface("border_siliconChip_qubitHousing",
+                                      phys_siliconChip, phys_qubitHousing,
+                                      fSiCopperInterface);
+  }
 
-   // Now set up the ground plane, in which the transmission line, resonators, and qubits will be located.
-   if (dp_useGroundPlane) {
-      G4Box *solid_groundPlane = new G4Box("GroundPlane_solid",
-                                           0.5 * dp_groundPlaneDimX,
-                                           0.5 * dp_groundPlaneDimY,
-                                           0.5 * dp_groundPlaneDimZ);
+  // Now set up the ground plane, in which the transmission line, resonators,
+  // and qubits will be located.
+  if (dp_useGroundPlane) {
+    G4Box *solid_groundPlane =
+        new G4Box("GroundPlane_solid", 0.5 * dp_groundPlaneDimX,
+                  0.5 * dp_groundPlaneDimY, 0.5 * dp_groundPlaneDimZ);
 
-      // Now attribute a physical material to the chip
-      G4LogicalVolume *log_groundPlane = new G4LogicalVolume(solid_groundPlane,
-                                                             fNiobium,
-                                                             "GroundPlane_log");
+    // Now attribute a physical material to the chip
+    G4LogicalVolume *log_groundPlane =
+        new G4LogicalVolume(solid_groundPlane, fNiobium, "GroundPlane_log");
 
-      // Now, create a physical volume and G4PVPlacement for storing as the final output
-      G4ThreeVector groundPlaneTranslate(0, 0, 0.5 * (dp_housingDimZ) + dp_eps + dp_groundPlaneDimZ * 0.5);
-      G4VPhysicalVolume *phys_groundPlane = new G4PVPlacement(0,
-                                                              groundPlaneTranslate,
-                                                              log_groundPlane,
-                                                              "GroundPlane",
-                                                              log_world,
-                                                              false,
-                                                              0,
-                                                              checkOverlaps);
+    // Now, create a physical volume and G4PVPlacement for storing as the final
+    // output
+    G4ThreeVector groundPlaneTranslate(
+        0, 0, 0.5 * (dp_housingDimZ) + dp_eps + dp_groundPlaneDimZ * 0.5);
+    G4VPhysicalVolume *phys_groundPlane =
+        new G4PVPlacement(0, groundPlaneTranslate, log_groundPlane,
+                          "GroundPlane", log_world, false, 0, checkOverlaps);
 
-      G4VisAttributes *groundPlaneVisAtt = new G4VisAttributes(G4Colour(0.0, 1.0, 1.0, 0.5));
-      groundPlaneVisAtt->SetVisibility(true);
-      log_groundPlane->SetVisAttributes(groundPlaneVisAtt);
+    G4VisAttributes *groundPlaneVisAtt =
+        new G4VisAttributes(G4Colour(0.0, 1.0, 1.0, 0.5));
+    groundPlaneVisAtt->SetVisibility(true);
+    log_groundPlane->SetVisAttributes(groundPlaneVisAtt);
 
-      // Set up the logical border surface
-      G4CMPLogicalBorderSurface *border_siliconChip_groundPlane = new G4CMPLogicalBorderSurface("border_siliconChip_groundPlane", phys_siliconChip, phys_groundPlane, fSiNbInterface);
+    // Set up the logical border surface
+    G4CMPLogicalBorderSurface *border_siliconChip_groundPlane =
+        new G4CMPLogicalBorderSurface("border_siliconChip_groundPlane",
+                                      phys_siliconChip, phys_groundPlane,
+                                      fSiNbInterface);
 
-      //-------------------------------------------------------------------------------------------------------------------
-      // Now set up the transmission line
-      if (dp_useTransmissionLine){
-         G4ThreeVector transmissionLineTranslate(0, 0, 0.0); // Since it's within the ground plane exactly; 0.5*(dp_housingDimZ) + dp_eps + dp_groundPlaneDimZ*0.5 );
-         FourQubitTransmissionLine *tLine = new FourQubitTransmissionLine(0,
-                                                                          transmissionLineTranslate,
-                                                                          "TransmissionLine",
-                                                                          log_groundPlane,
-                                                                          false,
-                                                                          0,
-                                                                          checkOverlaps);
-         G4LogicalVolume *log_tLine = tLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_tLine = tLine->GetPhysicalVolume();
+    // Now set up the transmission line
+    if (dp_useTransmissionLine) {
+      G4ThreeVector transmissionLineTranslate(
+          0, 0,
+          0.0);  // Since it's within the ground plane exactly;
+                 // 0.5*(dp_housingDimZ) + dp_eps + dp_groundPlaneDimZ*0.5 );
+      FourQubitTransmissionLine *tLine = new FourQubitTransmissionLine(
+          0, transmissionLineTranslate, "TransmissionLine", log_groundPlane,
+          false, 0, checkOverlaps);
+      G4LogicalVolume *log_tLine = tLine->GetLogicalVolume();
+      G4VPhysicalVolume *phys_tLine = tLine->GetPhysicalVolume();
 
-         // Now, if we're using the chip and ground plane AND the transmission line
-         // This gets a bit hairy, since the transmission line is composite of both Nb and vacuum.
-         // So we'll access the list of physical objects present in it and link those one-by-one to the
-         // silicon chip.
-         LogicalBorderCreation(tLine, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+      // Now, if we're using the chip and ground plane AND the transmission line
+      // This gets a bit hairy, since the transmission line is composite of both
+      // Nb and vacuum. So we'll access the list of physical objects present in
+      // it and link those one-by-one to the silicon chip.
+      LogicalBorderCreation(tLine, phys_siliconChip, fSiNbInterface,
+                            fSiVacuumInterface);
+    }
+
+    // Now set up a set of 6 resonator assemblies
+    if (dp_useResonatorAssembly) {
+      int nR = 6;
+      for (int iR = 0; iR < nR; ++iR) {
+        // First, get the translation vector for the resonator assembly
+        // For the top three, don't do a rotation. For the bottom three, do
+        G4ThreeVector resonatorAssemblyTranslate(0, 0, 0);
+        G4RotationMatrix *rotAssembly = 0;
+        if (iR <= 2) {
+          resonatorAssemblyTranslate =
+              G4ThreeVector(dp_resonatorLateralSpacing * (iR - 1) +
+                                dp_centralResonatorOffsetX,
+                            0.5 * dp_resonatorAssemblyBaseNbDimY +
+                                0.5 * dp_transmissionLineCavityFullWidth,
+                            0.0);
+          rotAssembly = 0;
+        } else {
+          resonatorAssemblyTranslate = G4ThreeVector(
+              dp_resonatorLateralSpacing * (iR - 4) -
+                  dp_centralResonatorOffsetX,  // Negative offset because qubit
+                                               // is mirrored on underside
+              -1 * (0.5 * dp_resonatorAssemblyBaseNbDimY +
+                    0.5 * dp_transmissionLineCavityFullWidth),
+              0.0);
+          rotAssembly = new G4RotationMatrix();
+          rotAssembly->rotateZ(180 * deg);
+        }
+
+        char name[400];
+        sprintf(name, "ResonatorAssembly_%d", iR);
+        G4String resonatorAssemblyName(name);
+        FourQubitResonatorAssembly *resonatorAssembly =
+            new FourQubitResonatorAssembly(
+                rotAssembly, resonatorAssemblyTranslate, resonatorAssemblyName,
+                log_groundPlane, false, 0, checkOverlaps);
+        G4LogicalVolume *log_resonatorAssembly =
+            resonatorAssembly->GetLogicalVolume();
+        G4VPhysicalVolume *phys_resonatorAssembly =
+            resonatorAssembly->GetPhysicalVolume();
+
+        // Do the logical border creation now
+        LogicalBorderCreation(resonatorAssembly, phys_siliconChip,
+                              fSiNbInterface, fSiVacuumInterface);
       }
+    }
 
-      // Now set up a set of 6 resonator assemblies
-      if (dp_useResonatorAssembly) {
-         int nR = 6;
-         for (int iR = 0; iR < nR; ++iR){
-            // First, get the translation vector for the resonator assembly
-            // For the top three, don't do a rotation. For the bottom three, do
-            G4ThreeVector resonatorAssemblyTranslate(0, 0, 0);
-            G4RotationMatrix *rotAssembly = 0;
-            if (iR <= 2) {
-               resonatorAssemblyTranslate = G4ThreeVector(dp_resonatorLateralSpacing * (iR - 1) + dp_centralResonatorOffsetX,
-                                                          0.5 * dp_resonatorAssemblyBaseNbDimY + 0.5 * dp_transmissionLineCavityFullWidth,
-                                                          0.0);
-               rotAssembly = 0;
-            }
-            else {
-               resonatorAssemblyTranslate = G4ThreeVector(dp_resonatorLateralSpacing * (iR - 4) - dp_centralResonatorOffsetX, // Negative offset because qubit is mirrored on underside
-                                                          -1 * (0.5 * dp_resonatorAssemblyBaseNbDimY + 0.5 * dp_transmissionLineCavityFullWidth),
-                                                          0.0);
-               rotAssembly = new G4RotationMatrix();
-               rotAssembly->rotateZ(180 * deg);
-            }
+    // Flux lines
+    if (dp_useFluxLines) {
+      // Top Center
+      G4ThreeVector topStraightFluxLineTranslate(
+          dp_topCenterFluxLineOffsetX, dp_topCenterFluxLineOffsetY, 0);
+      G4RotationMatrix *rotation = new G4RotationMatrix();
+      rotation->rotateY(dp_topCenterFluxLineRotY);
 
-            char name[400];
-            sprintf(name, "ResonatorAssembly_%d", iR);
-            G4String resonatorAssemblyName(name);
-            FourQubitResonatorAssembly *resonatorAssembly = new FourQubitResonatorAssembly(rotAssembly,
-                                                                                           resonatorAssemblyTranslate,
-                                                                                           resonatorAssemblyName,
-                                                                                           log_groundPlane,
-                                                                                           false,
-                                                                                           0,
-                                                                                           checkOverlaps);
-            G4LogicalVolume *log_resonatorAssembly = resonatorAssembly->GetLogicalVolume();
-            G4VPhysicalVolume *phys_resonatorAssembly = resonatorAssembly->GetPhysicalVolume();
+      FourQubitCurveFluxLine *topStraightFLine = new FourQubitCurveFluxLine(
+          rotation, topStraightFluxLineTranslate, "TopStraightFluxLine",
+          log_groundPlane, false, 0, checkOverlaps);
+      G4LogicalVolume *log_topStraightFline =
+          topStraightFLine->GetLogicalVolume();
+      G4VPhysicalVolume *phys_topStraightFline =
+          topStraightFLine->GetPhysicalVolume();
 
-            // Do the logical border creation now
-            LogicalBorderCreation(resonatorAssembly, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
-         }
-      }
+      // Do the logical border creation
+      LogicalBorderCreation(topStraightFLine, phys_siliconChip, fSiNbInterface,
+                            fSiVacuumInterface);
 
-      // Flux lines
-      if (dp_useFluxLines){
-         // Top Center
-         G4ThreeVector topStraightFluxLineTranslate(dp_topCenterFluxLineOffsetX, dp_topCenterFluxLineOffsetY, 0);
-         G4RotationMatrix *rotation = new G4RotationMatrix();
-         rotation->rotateY(dp_topCenterFluxLineRotY);
+      // Bottom Left
+      G4ThreeVector bottomStraightFluxLineTranslate(
+          dp_bottomLeftFluxLineOffsetX, -1 * dp_bottomLeftFluxLineOffsetY, 0);
+      G4RotationMatrix *rotBottomCenter = new G4RotationMatrix();
+      rotBottomCenter->rotateZ(180. * deg);
+      rotBottomCenter->rotateY(180. * deg);
 
-         FourQubitCurveFluxLine *topStraightFLine = new FourQubitCurveFluxLine(rotation,
-                                                                               topStraightFluxLineTranslate,
-                                                                               "TopStraightFluxLine",
-                                                                               log_groundPlane,
-                                                                               false,
-                                                                               0,
-                                                                               checkOverlaps);
-         G4LogicalVolume *log_topStraightFline = topStraightFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_topStraightFline = topStraightFLine->GetPhysicalVolume();
+      FourQubitCurveFluxLine *bottomStraightFLine = new FourQubitCurveFluxLine(
+          rotBottomCenter, bottomStraightFluxLineTranslate,
+          "BottomStraightFluxLine", log_groundPlane, false, 0, checkOverlaps);
+      G4LogicalVolume *log_bottomStraightFline =
+          bottomStraightFLine->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomStraightFline =
+          bottomStraightFLine->GetPhysicalVolume();
 
-         // Do the logical border creation
-         LogicalBorderCreation(topStraightFLine, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
- 
-         // Bottom Left
-         G4ThreeVector bottomStraightFluxLineTranslate(dp_bottomLeftFluxLineOffsetX, -1 * dp_bottomLeftFluxLineOffsetY, 0);
-         G4RotationMatrix *rotBottomCenter = new G4RotationMatrix();
-         rotBottomCenter->rotateZ(180. * deg);
-         rotBottomCenter->rotateY(180. * deg);
+      // Do the logical border creation
+      LogicalBorderCreation(bottomStraightFLine, phys_siliconChip,
+                            fSiNbInterface, fSiVacuumInterface);
 
-         FourQubitCurveFluxLine *bottomStraightFLine = new FourQubitCurveFluxLine(rotBottomCenter,
-                                                                                  bottomStraightFluxLineTranslate,
-                                                                                  "BottomStraightFluxLine",
-                                                                                  log_groundPlane,
-                                                                                  false,
-                                                                                  0,
-                                                                                  checkOverlaps);
-         G4LogicalVolume *log_bottomStraightFline = bottomStraightFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_bottomStraightFline = bottomStraightFLine->GetPhysicalVolume();
-
-         // Do the logical border creation
-         LogicalBorderCreation(bottomStraightFLine, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
-
-         // Bottom Right
-         G4ThreeVector bottomRightFluxLineTranslate(dp_bottomRightFluxLineOffsetX, -1 * dp_bottomRightFluxLineOffsetY, 0);
-         G4RotationMatrix *rotBottomRight = new G4RotationMatrix();
-         rotBottomRight->rotateZ(180. * deg);
-         FourQubitCurveFluxLine *bottomRightFLine = new FourQubitCurveFluxLine(rotBottomRight,
-                                                                                        bottomRightFluxLineTranslate,
-                                                                                        "bottomRightFluxLine",
-                                                                                        log_groundPlane,
-                                                                                        false,
-                                                                                        0,
-                                                                                        checkOverlaps);
-         G4LogicalVolume *log_bottomRightFline = bottomRightFLine->GetLogicalVolume();
-         G4VPhysicalVolume *phys_bottomRightFline = bottomRightFLine->GetPhysicalVolume();
-
-         // Do the logical border creation now
-         LogicalBorderCreation(bottomRightFLine, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
-      } // dp_useFluxLines
-
-
-      // Resonator
-      //G4ThreeVector locatetopResonator0(-0.39 * mm, 0.3 * mm, 0);
-      G4ThreeVector locatetopResonator0(-0.39 * mm, 0.39 * mm, 0);
-
-      FourQubitResonator *topResonator0 = new FourQubitResonator(0,
-                                                                 locatetopResonator0,
-                                                                 "topResonator0",
-                                                                 log_groundPlane,
-                                                                 false,
-                                                                 0,
-                                                                 checkOverlaps,
-                                                                 7,
-                                                                 546 * um);
-      G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
-      G4ThreeVector anchorq0 =  topResonator0->GetResEndVector() + locatetopResonator0;
+      // Bottom Right
+      G4ThreeVector bottomRightFluxLineTranslate(
+          dp_bottomRightFluxLineOffsetX, -1 * dp_bottomRightFluxLineOffsetY, 0);
+      G4RotationMatrix *rotBottomRight = new G4RotationMatrix();
+      rotBottomRight->rotateZ(180. * deg);
+      FourQubitCurveFluxLine *bottomRightFLine = new FourQubitCurveFluxLine(
+          rotBottomRight, bottomRightFluxLineTranslate, "bottomRightFluxLine",
+          log_groundPlane, false, 0, checkOverlaps);
+      G4LogicalVolume *log_bottomRightFline =
+          bottomRightFLine->GetLogicalVolume();
+      G4VPhysicalVolume *phys_bottomRightFline =
+          bottomRightFLine->GetPhysicalVolume();
 
       // Do the logical border creation now
-      LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+      LogicalBorderCreation(bottomRightFLine, phys_siliconChip, fSiNbInterface,
+                            fSiVacuumInterface);
+    }  // dp_useFluxLines
 
-      G4ThreeVector locatetopResonator1(1.17 * mm, 0.39 * mm, 0);
+    // Resonator
+    // G4ThreeVector locatetopResonator0(-0.39 * mm, 0.3 * mm, 0);
+    G4ThreeVector locatetopResonator0(-0.39 * mm, 0.39 * mm, 0);
 
-      FourQubitResonator *topResonator1 = new FourQubitResonator(0,
-                                                                 locatetopResonator1,
-                                                                 "topResonator1",
-                                                                 log_groundPlane,
-                                                                 false,
-                                                                 0,
-                                                                 checkOverlaps,
-                                                                 7,
-                                                                 312 * um);
-      G4LogicalVolume *log_topResonator1 = topResonator1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_topResonator1 = topResonator1->GetPhysicalVolume();
-      G4ThreeVector anchorq1 =  topResonator1->GetResEndVector() + locatetopResonator1;
+    FourQubitResonator *topResonator0 = new FourQubitResonator(
+        0, locatetopResonator0, "topResonator0", log_groundPlane, false, 0,
+        checkOverlaps, 7, 546 * um);
+    G4LogicalVolume *log_topResonator0 = topResonator0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_topResonator0 = topResonator0->GetPhysicalVolume();
+    G4ThreeVector anchorq0 =
+        topResonator0->GetResEndVector() + locatetopResonator0;
 
+    // Do the logical border creation now
+    LogicalBorderCreation(topResonator0, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(topResonator1, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    G4ThreeVector locatetopResonator1(1.17 * mm, 0.39 * mm, 0);
 
-      // bottom resonators
-      G4ThreeVector locatebottomResonator0(-1.17 * mm, -0.39 * mm, 0);
-      G4RotationMatrix *rotBottomResonator0 = new G4RotationMatrix();
-      rotBottomResonator0->rotateZ(180. * deg);
+    FourQubitResonator *topResonator1 = new FourQubitResonator(
+        0, locatetopResonator1, "topResonator1", log_groundPlane, false, 0,
+        checkOverlaps, 7, 312 * um);
+    G4LogicalVolume *log_topResonator1 = topResonator1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_topResonator1 = topResonator1->GetPhysicalVolume();
+    G4ThreeVector anchorq1 =
+        topResonator1->GetResEndVector() + locatetopResonator1;
 
-      FourQubitResonator *bottomResonator0 = new FourQubitResonator(rotBottomResonator0,
-                                                                 locatebottomResonator0,
-                                                                 "bottomResonator0",
-                                                                 log_groundPlane,
-                                                                 false,
-                                                                 0,
-                                                                 checkOverlaps,
-                                                                 7,
-                                                                 dp_shlConductorDimX);
-      G4LogicalVolume *log_bottomResonator0 = bottomResonator0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_bottomResonator0 = bottomResonator0->GetPhysicalVolume();
-      G4ThreeVector anchorq2 = *rotBottomResonator0 * ( bottomResonator0->GetResEndVector() ) + locatebottomResonator0;
+    // Do the logical border creation now
+    LogicalBorderCreation(topResonator1, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
+    // bottom resonators
+    G4ThreeVector locatebottomResonator0(-1.17 * mm, -0.39 * mm, 0);
+    G4RotationMatrix *rotBottomResonator0 = new G4RotationMatrix();
+    rotBottomResonator0->rotateZ(180. * deg);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(bottomResonator0, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
-   
-      G4ThreeVector locatebottomResonator1(0.39 * mm, -0.39 * mm, 0);
-      G4RotationMatrix *rotBottomResonator1 = new G4RotationMatrix();
-      rotBottomResonator1->rotateZ(180. * deg);
+    FourQubitResonator *bottomResonator0 = new FourQubitResonator(
+        rotBottomResonator0, locatebottomResonator0, "bottomResonator0",
+        log_groundPlane, false, 0, checkOverlaps, 7, dp_shlConductorDimX);
+    G4LogicalVolume *log_bottomResonator0 =
+        bottomResonator0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_bottomResonator0 =
+        bottomResonator0->GetPhysicalVolume();
+    G4ThreeVector anchorq2 =
+        *rotBottomResonator0 * (bottomResonator0->GetResEndVector()) +
+        locatebottomResonator0;
 
-      FourQubitResonator *bottomResonator1 = new FourQubitResonator(rotBottomResonator1,
-                                                                 locatebottomResonator1,
-                                                                 "bottomResonator1",
-                                                                 log_groundPlane,
-                                                                 false,
-                                                                 0,
-                                                                 checkOverlaps,
-                                                                 6,
-                                                                 624*um);
-      G4LogicalVolume *log_bottomResonator1 = bottomResonator1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_bottomResonator1 = bottomResonator1->GetPhysicalVolume();
-      G4ThreeVector anchorq3 =  *rotBottomResonator1 * bottomResonator1->GetResEndVector() + locatebottomResonator1;
+    // Do the logical border creation now
+    LogicalBorderCreation(bottomResonator0, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(bottomResonator1, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    G4ThreeVector locatebottomResonator1(0.39 * mm, -0.39 * mm, 0);
+    G4RotationMatrix *rotBottomResonator1 = new G4RotationMatrix();
+    rotBottomResonator1->rotateZ(180. * deg);
 
-      // other pieces
-      /////
-      // top q0
-      // q0c0
-      G4RotationMatrix *rotq0c0 = new G4RotationMatrix();
-      rotq0c0->rotateZ(0.0 * deg);
-      
-      anchorq0 = anchorq0 + G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
-      FourQubitCurve *q0c0 = new FourQubitCurve(rotq0c0,
-                                                anchorq0,
-                                                "q0c0",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, dp_resonatorCurveCentralRadius, 180, 90);
+    FourQubitResonator *bottomResonator1 = new FourQubitResonator(
+        rotBottomResonator1, locatebottomResonator1, "bottomResonator1",
+        log_groundPlane, false, 0, checkOverlaps, 6, 624 * um);
+    G4LogicalVolume *log_bottomResonator1 =
+        bottomResonator1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_bottomResonator1 =
+        bottomResonator1->GetPhysicalVolume();
+    G4ThreeVector anchorq3 =
+        *rotBottomResonator1 * bottomResonator1->GetResEndVector() +
+        locatebottomResonator1;
 
-      G4LogicalVolume *log_q0c0 = q0c0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q0c0 = q0c0->GetPhysicalVolume();
+    // Do the logical border creation now
+    LogicalBorderCreation(bottomResonator1, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      // q0l0
-      G4RotationMatrix *rotq0s0 = new G4RotationMatrix();
-      rotq0s0->rotateZ(90. * deg);
+    // other pieces
+    /////
+    // top q0
+    // q0c0
+    G4RotationMatrix *rotq0c0 = new G4RotationMatrix();
+    rotq0c0->rotateZ(0.0 * deg);
 
-      anchorq0 = anchorq0 + G4ThreeVector(-1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * 130 * um, 0);
+    anchorq0 = anchorq0 + G4ThreeVector(0,
+                                        dp_resonatorCurveCentralRadius +
+                                            (0.5 * dp_tlCouplingEmptyDimY),
+                                        0);  // fix later
+    FourQubitCurve *q0c0 = new FourQubitCurve(
+        rotq0c0, anchorq0, "q0c0", log_groundPlane, false, 0, checkOverlaps,
+        dp_resonatorCurveCentralRadius, 180, 90);
 
-      FourQubitStraight *q0s0 = new FourQubitStraight(rotq0s0,
-                                                      anchorq0,
-                                                      "q0s0",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, 130 * um);
-      G4LogicalVolume *log_q0s0 = q0s0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q0s0 = q0s0->GetPhysicalVolume();
+    G4LogicalVolume *log_q0c0 = q0c0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q0c0 = q0c0->GetPhysicalVolume();
 
-      // Xmon
-      //G4ThreeVector locateXmon0(-1.0 * mm, 1.0 * mm, 0);
-      G4ThreeVector locateXmon0 = anchorq0 + G4ThreeVector(0.0, (0.5 * 130 * um)+(0.5*dp_xmonBaseNbLayerDimY), 0);
+    // q0l0
+    G4RotationMatrix *rotq0s0 = new G4RotationMatrix();
+    rotq0s0->rotateZ(90. * deg);
 
-      FourQubitXmon *topXmon = new FourQubitXmon(0,
-                                                 locateXmon0,
-                                                 "Xmon",
-                                                 log_groundPlane,
-                                                 false,
-                                                 0,
-                                                 checkOverlaps);
-      G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
+    anchorq0 = anchorq0 + G4ThreeVector(-1.0 * (dp_resonatorCurveCentralRadius +
+                                                (0.5 * dp_tlCouplingEmptyDimY)),
+                                        0.5 * 130 * um, 0);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(topXmon, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    FourQubitStraight *q0s0 =
+        new FourQubitStraight(rotq0s0, anchorq0, "q0s0", log_groundPlane, false,
+                              0, checkOverlaps, 130 * um);
+    G4LogicalVolume *log_q0s0 = q0s0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q0s0 = q0s0->GetPhysicalVolume();
 
+    // Xmon
+    // G4ThreeVector locateXmon0(-1.0 * mm, 1.0 * mm, 0);
+    G4ThreeVector locateXmon0 =
+        anchorq0 +
+        G4ThreeVector(0.0, (0.5 * 130 * um) + (0.5 * dp_xmonBaseNbLayerDimY),
+                      0);
 
-      // q1
-      // q1c0
-      anchorq1 = anchorq1 + G4ThreeVector(0.0, dp_resonatorCurveCentralRadius, 0);
-      G4RotationMatrix *rotq1c0 = new G4RotationMatrix();
-      rotq1c0->rotateZ(180. * deg);
+    FourQubitXmon *topXmon = new FourQubitXmon(
+        0, locateXmon0, "Xmon", log_groundPlane, false, 0, checkOverlaps);
+    G4LogicalVolume *log_Xmon = topXmon->GetLogicalVolume();
+    G4VPhysicalVolume *phys_Xmon = topXmon->GetPhysicalVolume();
 
-      FourQubitCurve *q1c0 = new FourQubitCurve(rotq1c0,
-                                                anchorq1,
-                                                "q1c0",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, 45 * um, 0, 90);
-      G4LogicalVolume *log_q1c0 = q1c0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q1c0 = q1c0->GetPhysicalVolume();
+    // Do the logical border creation now
+    LogicalBorderCreation(topXmon, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      // q1s0
-      anchorq1 = anchorq1 + G4ThreeVector(-1.0 * dp_resonatorCurveCentralRadius, 0.5 * 320 * um, 0);
-      G4RotationMatrix *rotq1s0 = new G4RotationMatrix();
-      rotq1s0->rotateZ(90. * deg);
+    // q1
+    // q1c0
+    anchorq1 = anchorq1 + G4ThreeVector(0.0, dp_resonatorCurveCentralRadius, 0);
+    G4RotationMatrix *rotq1c0 = new G4RotationMatrix();
+    rotq1c0->rotateZ(180. * deg);
 
-      FourQubitStraight *q1s0 = new FourQubitStraight(rotq1s0,
-                                                      anchorq1,
-                                                      "q1s0",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, 320 * um);
-      G4LogicalVolume *log_q1s0 = q1s0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q1s0 = q1s0->GetPhysicalVolume();
+    FourQubitCurve *q1c0 =
+        new FourQubitCurve(rotq1c0, anchorq1, "q1c0", log_groundPlane, false, 0,
+                           checkOverlaps, 45 * um, 0, 90);
+    G4LogicalVolume *log_q1c0 = q1c0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q1c0 = q1c0->GetPhysicalVolume();
 
-      // q1c1
-      anchorq1 = anchorq1 + G4ThreeVector(dp_resonatorCurveCentralRadius, 0.5 * 320 * um, 0);
-      G4RotationMatrix *rotq1c1 = new G4RotationMatrix();
-      rotq1c1->rotateZ(270. * deg);
+    // q1s0
+    anchorq1 = anchorq1 + G4ThreeVector(-1.0 * dp_resonatorCurveCentralRadius,
+                                        0.5 * 320 * um, 0);
+    G4RotationMatrix *rotq1s0 = new G4RotationMatrix();
+    rotq1s0->rotateZ(90. * deg);
 
-      FourQubitCurve *q1c1 = new FourQubitCurve(rotq1c1,
-                                                anchorq1,
-                                                "q1c1",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, 45 * um, 0, 90);
-      G4LogicalVolume *log_q1c1 = q1c1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q1c1 = q1c1->GetPhysicalVolume();
+    FourQubitStraight *q1s0 =
+        new FourQubitStraight(rotq1s0, anchorq1, "q1s0", log_groundPlane, false,
+                              0, checkOverlaps, 320 * um);
+    G4LogicalVolume *log_q1s0 = q1s0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q1s0 = q1s0->GetPhysicalVolume();
 
-      // q1s1
-      G4float q1s1len = 200 * um;
-      anchorq1 = anchorq1 + G4ThreeVector(0.5 * q1s1len, dp_resonatorCurveCentralRadius, 0);
+    // q1c1
+    anchorq1 = anchorq1 +
+               G4ThreeVector(dp_resonatorCurveCentralRadius, 0.5 * 320 * um, 0);
+    G4RotationMatrix *rotq1c1 = new G4RotationMatrix();
+    rotq1c1->rotateZ(270. * deg);
 
-      G4RotationMatrix *rotq1s1 = new G4RotationMatrix();
-      rotq1s1->rotateZ(180. * deg);
+    FourQubitCurve *q1c1 =
+        new FourQubitCurve(rotq1c1, anchorq1, "q1c1", log_groundPlane, false, 0,
+                           checkOverlaps, 45 * um, 0, 90);
+    G4LogicalVolume *log_q1c1 = q1c1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q1c1 = q1c1->GetPhysicalVolume();
 
-      FourQubitStraight *q1s1 = new FourQubitStraight(rotq1s1,
-                                                      anchorq1,
-                                                      "q1s1",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, q1s1len);
-      G4LogicalVolume *log_q1s1 = q1s1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q1s1 = q1s1->GetPhysicalVolume();
+    // q1s1
+    G4float q1s1len = 200 * um;
+    anchorq1 = anchorq1 +
+               G4ThreeVector(0.5 * q1s1len, dp_resonatorCurveCentralRadius, 0);
 
-      // transmon
-      G4ThreeVector locateTransmon0 =  anchorq1 + G4ThreeVector(0.5 * q1s1len + (0.5*dp_transmonFieldDimX), 0, 0);
-      
-      FourQubitTransmon *topTransmon = new FourQubitTransmon(0,
-                                                            locateTransmon0,
-                                                            "Transmon",
-                                                            log_groundPlane,
-                                                            false,
-                                                            0,
-                                                            checkOverlaps);
-      G4LogicalVolume *log_topTransmon = topTransmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_topTransmon = topTransmon->GetPhysicalVolume();
+    G4RotationMatrix *rotq1s1 = new G4RotationMatrix();
+    rotq1s1->rotateZ(180. * deg);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(topTransmon, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    FourQubitStraight *q1s1 =
+        new FourQubitStraight(rotq1s1, anchorq1, "q1s1", log_groundPlane, false,
+                              0, checkOverlaps, q1s1len);
+    G4LogicalVolume *log_q1s1 = q1s1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q1s1 = q1s1->GetPhysicalVolume();
 
-      // bq1
-      // q2c0
-      G4RotationMatrix *rotq2c0 = new G4RotationMatrix();
-      rotq2c0->rotateZ(0.0 * deg);
-      
-      anchorq2 = anchorq2 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
-      FourQubitCurve *q2c0 = new FourQubitCurve(rotq2c0,
-                                                anchorq2,
-                                                "q2c0",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, dp_resonatorCurveCentralRadius, 0, 90);
+    // transmon
+    G4ThreeVector locateTransmon0 =
+        anchorq1 +
+        G4ThreeVector(0.5 * q1s1len + (0.5 * dp_transmonFieldDimX), 0, 0);
 
-      G4LogicalVolume *log_q2c0 = q2c0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q2c0 = q2c0->GetPhysicalVolume();
+    FourQubitTransmon *topTransmon =
+        new FourQubitTransmon(0, locateTransmon0, "Transmon", log_groundPlane,
+                              false, 0, checkOverlaps);
+    G4LogicalVolume *log_topTransmon = topTransmon->GetLogicalVolume();
+    G4VPhysicalVolume *phys_topTransmon = topTransmon->GetPhysicalVolume();
 
-      // q2l0
-      G4RotationMatrix *rotq2s0 = new G4RotationMatrix();
-      rotq2s0->rotateZ(90. * deg);
+    // Do the logical border creation now
+    LogicalBorderCreation(topTransmon, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      anchorq2 = anchorq2 - G4ThreeVector(-1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * 130 * um, 0);
+    // bq1
+    // q2c0
+    G4RotationMatrix *rotq2c0 = new G4RotationMatrix();
+    rotq2c0->rotateZ(0.0 * deg);
 
-      FourQubitStraight *q2s0 = new FourQubitStraight(rotq2s0,
-                                                      anchorq2,
-                                                      "q2s0",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, 130 * um);
-      G4LogicalVolume *log_q2s0 = q2s0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q2s0 = q2s0->GetPhysicalVolume();
+    anchorq2 = anchorq2 - G4ThreeVector(0,
+                                        dp_resonatorCurveCentralRadius +
+                                            (0.5 * dp_tlCouplingEmptyDimY),
+                                        0);  // fix later
+    FourQubitCurve *q2c0 = new FourQubitCurve(
+        rotq2c0, anchorq2, "q2c0", log_groundPlane, false, 0, checkOverlaps,
+        dp_resonatorCurveCentralRadius, 0, 90);
 
-      G4ThreeVector locateXmon1 = anchorq2 - G4ThreeVector(0.0, (0.5 * 130 * um)+(0.5*dp_xmonBaseNbLayerDimY), 0);
-      G4RotationMatrix *rotBottomRightXmon = new G4RotationMatrix();
-      rotBottomRightXmon->rotateX(180. * deg);
+    G4LogicalVolume *log_q2c0 = q2c0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q2c0 = q2c0->GetPhysicalVolume();
 
-      FourQubitXmon *bottomXmon = new FourQubitXmon(rotBottomRightXmon,
-                                                 locateXmon1,
-                                                 "Xmon",
-                                                 log_groundPlane,
-                                                 false,
-                                                 0,
-                                                 checkOverlaps);
-      G4LogicalVolume *log_bottomXmon = bottomXmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_bottomXmon = bottomXmon->GetPhysicalVolume();
+    // q2l0
+    G4RotationMatrix *rotq2s0 = new G4RotationMatrix();
+    rotq2s0->rotateZ(90. * deg);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(bottomXmon, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    anchorq2 = anchorq2 - G4ThreeVector(-1.0 * (dp_resonatorCurveCentralRadius +
+                                                (0.5 * dp_tlCouplingEmptyDimY)),
+                                        0.5 * 130 * um, 0);
 
-      // q3
-      // q3c0
-      G4RotationMatrix *rotq3c0 = new G4RotationMatrix();
-      rotq3c0->rotateZ(0.0 * deg);
-      
-      anchorq3 = anchorq3 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
-      FourQubitCurve *q3c0 = new FourQubitCurve(rotq3c0,
-                                                anchorq3,
-                                                "q3c0",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, dp_resonatorCurveCentralRadius, 90, 90);
+    FourQubitStraight *q2s0 =
+        new FourQubitStraight(rotq2s0, anchorq2, "q2s0", log_groundPlane, false,
+                              0, checkOverlaps, 130 * um);
+    G4LogicalVolume *log_q2s0 = q2s0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q2s0 = q2s0->GetPhysicalVolume();
 
-      G4LogicalVolume *log_q3c0 = q3c0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q3c0 = q3c0->GetPhysicalVolume();
+    G4ThreeVector locateXmon1 =
+        anchorq2 -
+        G4ThreeVector(0.0, (0.5 * 130 * um) + (0.5 * dp_xmonBaseNbLayerDimY),
+                      0);
+    G4RotationMatrix *rotBottomRightXmon = new G4RotationMatrix();
+    rotBottomRightXmon->rotateX(180. * deg);
 
-      // q2l0
-      G4RotationMatrix *rotq3s0 = new G4RotationMatrix();
-      rotq3s0->rotateZ(90. * deg);
+    FourQubitXmon *bottomXmon =
+        new FourQubitXmon(rotBottomRightXmon, locateXmon1, "Xmon",
+                          log_groundPlane, false, 0, checkOverlaps);
+    G4LogicalVolume *log_bottomXmon = bottomXmon->GetLogicalVolume();
+    G4VPhysicalVolume *phys_bottomXmon = bottomXmon->GetPhysicalVolume();
 
-      G4float q3s0len =  350 * um;
-      anchorq3 = anchorq3 - G4ThreeVector(1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0.5 * q3s0len, 0);
+    // Do the logical border creation now
+    LogicalBorderCreation(bottomXmon, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
 
-      FourQubitStraight *q3s0 = new FourQubitStraight(rotq3s0,
-                                                      anchorq3,
-                                                      "q3s0",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, q3s0len);
-      G4LogicalVolume *log_q3s0 = q3s0->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q3s0 = q3s0->GetPhysicalVolume();
+    // q3
+    // q3c0
+    G4RotationMatrix *rotq3c0 = new G4RotationMatrix();
+    rotq3c0->rotateZ(0.0 * deg);
 
-      // q3c1
-      G4RotationMatrix *rotq3c1 = new G4RotationMatrix();
-      rotq3c1->rotateZ(0.0 * deg);
-      
-      //anchorq3 = anchorq3 - G4ThreeVector(0, dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
-      anchorq3 = anchorq3 + G4ThreeVector(dp_resonatorCurveCentralRadius + 0.5*dp_tlCouplingEmptyDimY, -0.5 * q3s0len, 0);  // fix later
+    anchorq3 = anchorq3 - G4ThreeVector(0,
+                                        dp_resonatorCurveCentralRadius +
+                                            (0.5 * dp_tlCouplingEmptyDimY),
+                                        0);  // fix later
+    FourQubitCurve *q3c0 = new FourQubitCurve(
+        rotq3c0, anchorq3, "q3c0", log_groundPlane, false, 0, checkOverlaps,
+        dp_resonatorCurveCentralRadius, 90, 90);
 
-      FourQubitCurve *q3c1 = new FourQubitCurve(rotq3c1,
-                                                anchorq3,
-                                                "q3c1",
-                                                log_groundPlane,
-                                                false,
-                                                0,
-                                                checkOverlaps, dp_resonatorCurveCentralRadius, 180, 90);
+    G4LogicalVolume *log_q3c0 = q3c0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q3c0 = q3c0->GetPhysicalVolume();
 
-      G4LogicalVolume *log_q3c1 = q3c1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q3c1 = q3c1->GetPhysicalVolume();
+    // q2l0
+    G4RotationMatrix *rotq3s0 = new G4RotationMatrix();
+    rotq3s0->rotateZ(90. * deg);
 
-      // q2l1
-      G4RotationMatrix *rotq3s1 = new G4RotationMatrix();
-      rotq3s1->rotateZ(0. * deg);
+    G4float q3s0len = 350 * um;
+    anchorq3 = anchorq3 - G4ThreeVector(1.0 * (dp_resonatorCurveCentralRadius +
+                                               (0.5 * dp_tlCouplingEmptyDimY)),
+                                        0.5 * q3s0len, 0);
 
-      G4float q3s1len =  350 * um;
-      anchorq3 = anchorq3 + G4ThreeVector(0.5 * q3s1len, -1.0*(dp_resonatorCurveCentralRadius + (0.5*dp_tlCouplingEmptyDimY)), 0);
+    FourQubitStraight *q3s0 =
+        new FourQubitStraight(rotq3s0, anchorq3, "q3s0", log_groundPlane, false,
+                              0, checkOverlaps, q3s0len);
+    G4LogicalVolume *log_q3s0 = q3s0->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q3s0 = q3s0->GetPhysicalVolume();
 
-      FourQubitStraight *q3s1 = new FourQubitStraight(rotq3s1,
-                                                      anchorq3,
-                                                      "q3s1",
-                                                      log_groundPlane,
-                                                      false,
-                                                      0,
-                                                      checkOverlaps, q3s1len);
-      G4LogicalVolume *log_q3s1 = q3s1->GetLogicalVolume();
-      G4VPhysicalVolume *phys_q3s1 = q3s1->GetPhysicalVolume();
+    // q3c1
+    G4RotationMatrix *rotq3c1 = new G4RotationMatrix();
+    rotq3c1->rotateZ(0.0 * deg);
 
+    // anchorq3 = anchorq3 - G4ThreeVector(0, dp_resonatorCurveCentralRadius +
+    // (0.5*dp_tlCouplingEmptyDimY), 0);  // fix later
+    anchorq3 = anchorq3 + G4ThreeVector(dp_resonatorCurveCentralRadius +
+                                            0.5 * dp_tlCouplingEmptyDimY,
+                                        -0.5 * q3s0len, 0);  // fix later
 
-      G4ThreeVector locateTransmon1 = anchorq3 + G4ThreeVector((0.5 * q3s1len)+(0.5*dp_transmonFieldDimY), 0.0, 0);
-      
-      FourQubitTransmon *bottomTransmon = new FourQubitTransmon(0,
-                                                            locateTransmon1,
-                                                            "Transmon",
-                                                            log_groundPlane,
-                                                            false,
-                                                            0,
-                                                            checkOverlaps);
-      G4LogicalVolume *log_bottomTransmon = bottomTransmon->GetLogicalVolume();
-      G4VPhysicalVolume *phys_bottomTransmon = bottomTransmon->GetPhysicalVolume();
+    FourQubitCurve *q3c1 = new FourQubitCurve(
+        rotq3c1, anchorq3, "q3c1", log_groundPlane, false, 0, checkOverlaps,
+        dp_resonatorCurveCentralRadius, 180, 90);
 
-      // Do the logical border creation now
-      LogicalBorderCreation(bottomTransmon, phys_siliconChip, fSiNbInterface, fSiVacuumInterface);
+    G4LogicalVolume *log_q3c1 = q3c1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q3c1 = q3c1->GetPhysicalVolume();
 
-   } // end
+    // q2l1
+    G4RotationMatrix *rotq3s1 = new G4RotationMatrix();
+    rotq3s1->rotateZ(0. * deg);
 
-   // Now we establish a sensitivity object
+    G4float q3s1len = 350 * um;
+    anchorq3 = anchorq3 + G4ThreeVector(0.5 * q3s1len,
+                                        -1.0 * (dp_resonatorCurveCentralRadius +
+                                                (0.5 * dp_tlCouplingEmptyDimY)),
+                                        0);
 
-   G4SDManager *SDman = G4SDManager::GetSDMpointer();
-   if (!fSuperconductorSensitivity)
-      fSuperconductorSensitivity = new FourQubitSensitivity("PhononElectrode");
-   SDman->AddNewDetector(fSuperconductorSensitivity);
-   log_siliconChip->SetSensitiveDetector(fSuperconductorSensitivity);
+    FourQubitStraight *q3s1 =
+        new FourQubitStraight(rotq3s1, anchorq3, "q3s1", log_groundPlane, false,
+                              0, checkOverlaps, q3s1len);
+    G4LogicalVolume *log_q3s1 = q3s1->GetLogicalVolume();
+    G4VPhysicalVolume *phys_q3s1 = q3s1->GetPhysicalVolume();
+
+    G4ThreeVector locateTransmon1 =
+        anchorq3 +
+        G4ThreeVector((0.5 * q3s1len) + (0.5 * dp_transmonFieldDimY), 0.0, 0);
+
+    FourQubitTransmon *bottomTransmon =
+        new FourQubitTransmon(0, locateTransmon1, "Transmon", log_groundPlane,
+                              false, 0, checkOverlaps);
+    G4LogicalVolume *log_bottomTransmon = bottomTransmon->GetLogicalVolume();
+    G4VPhysicalVolume *phys_bottomTransmon =
+        bottomTransmon->GetPhysicalVolume();
+
+    // Do the logical border creation now
+    LogicalBorderCreation(bottomTransmon, phys_siliconChip, fSiNbInterface,
+                          fSiVacuumInterface);
+
+  }  // end
+
+  // Now we establish a sensitivity object
+
+  G4SDManager *SDman = G4SDManager::GetSDMpointer();
+  if (!fSuperconductorSensitivity)
+    fSuperconductorSensitivity = new FourQubitSensitivity("PhononElectrode");
+  SDman->AddNewDetector(fSuperconductorSensitivity);
+  log_siliconChip->SetSensitiveDetector(fSuperconductorSensitivity);
 }
 
-// Set up a phonon sensor for this surface property object. I'm pretty sure that this
-// phonon sensor doesn't get stapled to individual geometrical objects, but rather gets
-// stapled to a surface property, but I'm not sure... have to ask mKelsey
+// Set up a phonon sensor for this surface property object. I'm pretty sure that
+// this phonon sensor doesn't get stapled to individual geometrical objects, but
+// rather gets stapled to a surface property, but I'm not sure... have to ask
+// mKelsey
 void FourQubitDetectorConstruction::AttachPhononSensor(G4CMPSurfaceProperty *surfProp)
 {
    // If no surface, don't do anycomponentModel
@@ -781,8 +744,8 @@ void FourQubitDetectorConstruction::AttachPhononSensor(G4CMPSurfaceProperty *sur
    sensorProp->AddConstProperty("vSound", 3.480 * CLHEP::km / CLHEP::s); // True for room temperature, probably good to 10%ish - should follow up
    sensorProp->AddConstProperty("subgapAbsorption", 0.0);                // Assuming that since we're mostly sensitive to quasiparticle density, phonon "heat" here isn't somecomponentModel that we're sensitive to? Unsure how to select this.
 
-   //  sensorProp->AddConstProperty("gapEnergy",3.0e-3*CLHEP::eV);      //Reasonably motivated. Novotny and Meincke, 1975 (2.8-3.14 meV)
-   //  sensorProp->AddConstProperty("phononLifetime",242.*ps);      //Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic time for Nb.
+   // sensorProp->AddConstProperty("gapEnergy",3.0e-3*CLHEP::eV);      //Reasonably motivated. Novotny and Meincke, 1975 (2.8-3.14 meV)
+   // sensorProp->AddConstProperty("phononLifetime",242.*ps);      //Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic time for Nb.
 
    surfProp->SetPhononElectrode(new G4CMPPhononElectrode);
 }
