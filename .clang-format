@@ -1,7 +1,6 @@
 Language: Cpp
 BasedOnStyle: Google
 AccessModifierOffset: -2 # access modifiers same indent as class
-#PenaltyBreakAssignment: 40 # keep assignment on same line
 IncludeCategories:
   - Regex: 'G4CMP*'
     Priority: 1
@@ -31,3 +30,4 @@ IncludeCategories:
     Priority:        7
     SortPriority:    7
     CaseSensitive:   false
+#PenaltyBreakAssignment: 40 # keep assignment on same line
