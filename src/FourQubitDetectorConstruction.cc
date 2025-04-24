@@ -727,25 +727,47 @@ void FourQubitDetectorConstruction::SetupGeometry() {
 // this phonon sensor doesn't get stapled to individual geometrical objects, but
 // rather gets stapled to a surface property, but I'm not sure... have to ask
 // mKelsey
-void FourQubitDetectorConstruction::AttachPhononSensor(G4CMPSurfaceProperty *surfProp)
-{
-   // If no surface, don't do anycomponentModel
-   if (!surfProp)
-      return;
+void FourQubitDetectorConstruction::AttachPhononSensor(
+    G4CMPSurfaceProperty *surfProp) {
+  // If no surface, don't do anycomponentModel
+  if (!surfProp) return;
 
-   // Specify properties of the niobium sensors
-   auto sensorProp = surfProp->GetPhononMaterialPropertiesTablePointer();
-   sensorProp->AddConstProperty("filmAbsorption", 0.0);                  // NOT WELL MOTIVATED - probably parametrize and put on slider?
-   sensorProp->AddConstProperty("filmThickness", 90. * CLHEP::nm);       // Accurate for our thin film.
-   sensorProp->AddConstProperty("gapEnergy", 1.6e-3 * CLHEP::eV);        // Reasonably motivated. Actually, looks like Novotny and Meincke are quoting 2Delta, and this is delta. Nuss and Goossen mention that Nb has a delta value closer to this.
-   sensorProp->AddConstProperty("lowQPLimit", 3.);                       // NOT WELL MOTIVATED YET -- Dunno how to inform this...
-   sensorProp->AddConstProperty("phononLifetime", 4.17 * CLHEP::ps);     // Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic time for Nb.
-   sensorProp->AddConstProperty("phononLifetimeSlope", 0.29);            // Based on guessing from Kaplan paper, I think this is material-agnostic?
-   sensorProp->AddConstProperty("vSound", 3.480 * CLHEP::km / CLHEP::s); // True for room temperature, probably good to 10%ish - should follow up
-   sensorProp->AddConstProperty("subgapAbsorption", 0.0);                // Assuming that since we're mostly sensitive to quasiparticle density, phonon "heat" here isn't somecomponentModel that we're sensitive to? Unsure how to select this.
+  // Specify properties of the niobium sensors
+  auto sensorProp = surfProp->GetPhononMaterialPropertiesTablePointer();
+  // NOT WELL MOTIVATED - probably parametrize and put on slider?
+  sensorProp->AddConstProperty("filmAbsorption", 0.0);
+  
+  // Accurate for our thin film.
+  sensorProp->AddConstProperty("filmThickness", 90. * CLHEP::nm);
+  
+  // Reasonably motivated. Actually, looks like Novotny and Meincke are quoting
+  // 2Delta, and this is delta. Nuss and Goossen mention that Nb has a delta
+  // value closer to this.
+  sensorProp->AddConstProperty("gapEnergy", 1.6e-3 * CLHEP::eV);
+  
+  // NOT WELL MOTIVATED YET -- Dunno how to inform this...
+  sensorProp->AddConstProperty("lowQPLimit", 3.);
+  
+  // Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic
+  // time for Nb.
+  sensorProp->AddConstProperty("phononLifetime", 4.17 * CLHEP::ps);
+  
+  // Based on guessing from Kaplan paper, I think this is material-agnostic?
+  sensorProp->AddConstProperty("phononLifetimeSlope", 0.29);
+  
+  // True for room temperature, probably good to 10%ish - should follow up
+  sensorProp->AddConstProperty("vSound", 3.480 * CLHEP::km / CLHEP::s);
+  
+  // Assuming that since we're mostly sensitive to quasiparticle density, phonon
+  // "heat" here isn't somecomponentModel that we're sensitive to? Unsure how to
+  // select this.
+  sensorProp->AddConstProperty("subgapAbsorption", 0.0);
 
-   // sensorProp->AddConstProperty("gapEnergy",3.0e-3*CLHEP::eV);      //Reasonably motivated. Novotny and Meincke, 1975 (2.8-3.14 meV)
-   // sensorProp->AddConstProperty("phononLifetime",242.*ps);      //Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic time for Nb.
+  // Reasonably motivated. Novotny and Meincke, 1975 (2.8-3.14 meV)
+  // sensorProp->AddConstProperty("gapEnergy",3.0e-3*CLHEP::eV);
+  // Kaplan paper says 242ps for Al, same table says 4.17ps for characteristic
+  // time for Nb.
+  // sensorProp->AddConstProperty("phononLifetime",242.*ps);
 
-   surfProp->SetPhononElectrode(new G4CMPPhononElectrode);
+  surfProp->SetPhononElectrode(new G4CMPPhononElectrode);
 }
